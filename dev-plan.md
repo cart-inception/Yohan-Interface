@@ -34,9 +34,9 @@ This document provides a highly detailed, phased development plan. Each task is 
   - [x] 1.4.3: In `app/schemas/websockets.py`, define models for WebSocket messages, such as `WebSocketMessage` with fields for `event_type` (e.g., `status_update`, `llm_response`) and `payload`.
 
 - **1.5: Service Layer**
-  - [ ] 1.5.1: Add `httpx` and `icalendar` to `requirements.txt` and install them.
-  - [ ] 1.5.2: Create `app/services/weather_service.py`. Implement an `async` function `get_weather_data` that uses `httpx` to call the OpenWeatherMap API and returns data parsed into your Pydantic schemas.
-  - [ ] 1.5.3: Create `app/services/calendar_service.py`. Implement a function `get_calendar_events` that fetches the `.ics` file, parses it with `icalendar`, and returns a list of `CalendarEvent` objects.
+  - [x] 1.5.1: Add `httpx` and `icalendar` to `requirements.txt` and install them.
+  - [x] 1.5.2: Create `app/services/weather_service.py`. Implement an `async` function `get_weather_data` that uses `httpx` to call the OpenWeatherMap API and returns data parsed into your Pydantic schemas.
+  - [x] 1.5.3: Create `app/services/calendar_service.py`. Implement a function `get_calendar_events` that fetches the `.ics` file, parses it with `icalendar`, and returns a list of `CalendarEvent` objects.
 
 - **1.6: API Routers**
   - [ ] 1.6.1: Create `app/routers/weather.py`. Define an `APIRouter`, create a `GET /` endpoint that calls the `weather_service`, and set the `response_model` to your Pydantic schema.
