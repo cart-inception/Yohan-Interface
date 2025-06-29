@@ -39,9 +39,9 @@ This document provides a highly detailed, phased development plan. Each task is 
   - [x] 1.5.3: Create `app/services/calendar_service.py`. Implement a function `get_calendar_events` that fetches the `.ics` file, parses it with `icalendar`, and returns a list of `CalendarEvent` objects.
 
 - **1.6: API Routers**
-  - [ ] 1.6.1: Create `app/routers/weather.py`. Define an `APIRouter`, create a `GET /` endpoint that calls the `weather_service`, and set the `response_model` to your Pydantic schema.
-  - [ ] 1.6.2: Create `app/routers/calendar.py` with a similar structure for the calendar endpoint.
-  - [ ] 1.6.3: In `app/main.py`, include these new routers in the main FastAPI app using `app.include_router()`.
+  - [x] 1.6.1: Create `app/routers/weather.py`. Define an `APIRouter`, create a `GET /` endpoint that calls the `weather_service`, and set the `response_model` to your Pydantic schema.
+  - [x] 1.6.2: Create `app/routers/calendar.py` with a similar structure for the calendar endpoint.
+  - [x] 1.6.3: In `app/main.py`, include these new routers in the main FastAPI app using `app.include_router()`.
 
 - **1.7: WebSocket Endpoint**
   - [ ] 1.7.1: Create `app/websocket_manager.py`. Implement a `ConnectionManager` class to manage active WebSocket connections (connect, disconnect, send messages).
