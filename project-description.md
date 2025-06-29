@@ -1,4 +1,4 @@
----
+
 # Project: Yohan
 
 This document outlines the technical architecture and feature set for **Yohan**, a bespoke smart calendar application. The goal is to create a central household information hub with a clean, modern, and intuitive interface that is fully controllable via both a touchscreen and voice commands.
