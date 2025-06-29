@@ -44,8 +44,8 @@ This document provides a highly detailed, phased development plan. Each task is 
   - [x] 1.6.3: In `app/main.py`, include these new routers in the main FastAPI app using `app.include_router()`.
 
 - **1.7: WebSocket Endpoint**
-  - [ ] 1.7.1: Create `app/websocket_manager.py`. Implement a `ConnectionManager` class to manage active WebSocket connections (connect, disconnect, send messages).
-  - [ ] 1.7.2: Create `app/routers/comms.py`. Define the `WS /ws/comms` endpoint. Use the `ConnectionManager` to handle clients and implement a loop to listen for incoming messages and broadcast responses.
+  - [x] 1.7.1: Create `app/websocket_manager.py`. Implement a `ConnectionManager` class to manage active WebSocket connections (connect, disconnect, send messages).
+  - [x] 1.7.2: Create `app/routers/comms.py`. Define the `WS /ws/comms` endpoint. Use the `ConnectionManager` to handle clients and implement a loop to listen for incoming messages and broadcast responses.
 
 ---
 
@@ -54,27 +54,27 @@ This document provides a highly detailed, phased development plan. Each task is 
 **Goal:** Set up a modern frontend project, establish the UI framework and state management, and connect to the backend.
 
 - **2.1: Project Scaffolding with Vite**
-  - [ ] 2.1.1: In a separate directory, create the frontend project: `npm create vite@latest yohan-frontend -- --template react-ts`.
-  - [ ] 2.1.2: `cd yohan-frontend` and install dependencies: `npm install`.
-  - [ ] 2.1.3: Clean up default boilerplate from `App.tsx` and `index.css`.
-  - [ ] 2.1.4: Create a clear directory structure: `src/components`, `src/views`, `src/hooks`, `src/lib`, `src/store`, `src/types`.
+  - [x] 2.1.1: In a separate directory, create the frontend project: `npm create vite@latest yohan-frontend -- --template react-ts`.
+  - [x] 2.1.2: `cd yohan-frontend` and install dependencies: `npm install`.
+  - [x] 2.1.3: Clean up default boilerplate from `App.tsx` and `index.css`.
+  - [x] 2.1.4: Create a clear directory structure: `src/components`, `src/views`, `src/hooks`, `src/lib`, `src/store`, `src/types`.
 
 - **2.2: UI Framework & Styling**
-  - [ ] 2.2.1: Install Tailwind CSS and its dependencies: `npm install -D tailwindcss postcss autoprefixer` and initialize: `npx tailwindcss init -p`.
-  - [ ] 2.2.2: Configure `tailwind.config.js` and `index.css` according to the official documentation.
-  - [ ] 2.2.3: Use the `shadcn/ui` CLI to initialize the component library: `npx shadcn-ui@latest init`.
-  - [ ] 2.2.4: Add a few base components to start: `npx shadcn-ui@latest add card button`.
+  - [x] 2.2.1: Install Tailwind CSS and its dependencies: `npm install -D tailwindcss postcss autoprefixer` and initialize: `npx tailwindcss init -p`.
+  - [x] 2.2.2: Configure `tailwind.config.js` and `index.css` according to the official documentation.
+  - [x] 2.2.3: Use the `shadcn/ui` CLI to initialize the component library: `npx shadcn-ui@latest init`.
+  - [x] 2.2.4: Add a few base components to start: `npx shadcn-ui@latest add card button`.
 
 - **2.3: State Management & Types**
-  - [ ] 2.3.1: Install Zustand: `npm install zustand`.
-  - [ ] 2.3.2: In `src/types`, create files to mirror the backend's Pydantic schemas (e.g., `weather.ts`, `calendar.ts`).
-  - [ ] 2.3.3: Create `src/store/appStore.ts`. Define a store that holds `weatherData`, `calendarEvents`, `chatHistory`, and `voiceStatus`. Create actions to update this state.
+  - [x] 2.3.1: Install Zustand: `npm install zustand`.
+  - [x] 2.3.2: In `src/types`, create files to mirror the backend's Pydantic schemas (e.g., `weather.ts`, `calendar.ts`).
+  - [x] 2.3.3: Create `src/store/appStore.ts`. Define a store that holds `weatherData`, `calendarEvents`, `chatHistory`, and `voiceStatus`. Create actions to update this state.
 
 - **2.4: API & WebSocket Client**
-  - [ ] 2.4.1: Create `src/lib/api.ts`. Implement `fetchWeather()` and `fetchCalendar()` functions that call the backend endpoints and return typed data.
-  - [ ] 2.4.2: Install a WebSocket client library: `npm install react-use-websocket`.
-  - [ ] 2.4.3: In `App.tsx` or a dedicated hook (`src/hooks/useAppWebSocket.ts`), establish the WebSocket connection. Use the `onMessage` callback to parse incoming messages and update the Zustand store accordingly.
-  - [ ] 2.4.4: On initial app load, call the API functions to fetch and display the initial weather and calendar data.
+  - [x] 2.4.1: Create `src/lib/api.ts`. Implement `fetchWeather()` and `fetchCalendar()` functions that call the backend endpoints and return typed data.
+  - [x] 2.4.2: Install a WebSocket client library: `npm install react-use-websocket`.
+  - [x] 2.4.3: In `App.tsx` or a dedicated hook (`src/hooks/useAppWebSocket.ts`), establish the WebSocket connection. Use the `onMessage` callback to parse incoming messages and update the Zustand store accordingly.
+  - [x] 2.4.4: On initial app load, call the API functions to fetch and display the initial weather and calendar data.
 
 ---
 

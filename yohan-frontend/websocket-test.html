@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>WebSocket Connection Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="messages"></div>
+    <button onclick="sendTestMessage()">Send Test Message</button>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:8000/ws/comms');
+        const statusDiv = document.getElementById('status');
+        const messagesDiv = document.getElementById('messages');
+
+        ws.onopen = function(event) {
+            console.log('WebSocket connected');
+            statusDiv.textContent = 'Connected';
+            statusDiv.style.color = 'green';
+        };
+
+        ws.onmessage = function(event) {
+            console.log('Message received:', event.data);
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = 'Received: ' + event.data;
+            messagesDiv.appendChild(messageDiv);
+        };
+
+        ws.onerror = function(error) {
+            console.error('WebSocket error:', error);
+            statusDiv.textContent = 'Error: ' + error;
+            statusDiv.style.color = 'red';
+        };
+
+        ws.onclose = function(event) {
+            console.log('WebSocket closed:', event);
+            statusDiv.textContent = 'Closed: ' + event.code + ' - ' + event.reason;
+            statusDiv.style.color = 'red';
+        };
+
+        function sendTestMessage() {
+            if (ws.readyState === WebSocket.OPEN) {
+                const message = {
+                    event_type: 'ping',
+                    payload: { timestamp: new Date().toISOString() }
+                };
+                ws.send(JSON.stringify(message));
+                console.log('Sent:', message);
+            } else {
+                console.log('WebSocket not open, ready state:', ws.readyState);
+            }
+        }
+    </script>
+</body>
+</html>

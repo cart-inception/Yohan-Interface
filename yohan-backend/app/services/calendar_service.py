@@ -22,14 +22,32 @@ def get_calendar_events() -> List[CalendarEvent]:
 
         for component in cal.walk():
             if component.name == "VEVENT":
-                dtstart = component.get('dtstart').dt
-                dtend = component.get('dtend').dt
+                # Check if dtstart and dtend exist
+                dtstart_prop = component.get('dtstart')
+                dtend_prop = component.get('dtend')
 
-                # Ensure timezone-aware comparison
-                if dtstart.tzinfo is None:
-                    dtstart = dtstart.replace(tzinfo=timezone.utc)
-                if dtend.tzinfo is None:
-                    dtend = dtend.replace(tzinfo=timezone.utc)
+                if dtstart_prop is None or dtend_prop is None:
+                    continue  # Skip events without proper start/end times
+
+                dtstart = dtstart_prop.dt
+                dtend = dtend_prop.dt
+
+                # Handle both date and datetime objects
+                if hasattr(dtstart, 'tzinfo'):
+                    # It's a datetime object
+                    if dtstart.tzinfo is None:
+                        dtstart = dtstart.replace(tzinfo=timezone.utc)
+                else:
+                    # It's a date object, convert to datetime
+                    dtstart = datetime.combine(dtstart, datetime.min.time()).replace(tzinfo=timezone.utc)
+
+                if hasattr(dtend, 'tzinfo'):
+                    # It's a datetime object
+                    if dtend.tzinfo is None:
+                        dtend = dtend.replace(tzinfo=timezone.utc)
+                else:
+                    # It's a date object, convert to datetime
+                    dtend = datetime.combine(dtend, datetime.max.time()).replace(tzinfo=timezone.utc)
 
                 if dtend > now:
                     events.append(

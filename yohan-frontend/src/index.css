@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark theme inspired by the mockup */
+    --background: 220 27% 8%;
+    --foreground: 210 40% 98%;
+    --card: 220 27% 12%;
+    --card-foreground: 210 40% 98%;
+    --popover: 220 27% 12%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 220 27% 8%;
+    --secondary: 220 27% 16%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 27% 16%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 220 27% 8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 91% 60%;
+    --input: 220 27% 16%;
+    --ring: 217 91% 60%;
+    --chart-1: 217 91% 60%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.75rem;
+
+    /* Custom gradient colors for borders */
+    --gradient-start: 217 91% 60%;
+    --gradient-end: 200 91% 60%;
+  }
+
+  .dark {
+    /* Keep same values for dark mode since we're using dark theme by default */
+    --background: 220 27% 8%;
+    --foreground: 210 40% 98%;
+    --card: 220 27% 12%;
+    --card-foreground: 210 40% 98%;
+    --popover: 220 27% 12%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 220 27% 8%;
+    --secondary: 220 27% 16%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 27% 16%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 220 27% 8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 91% 60%;
+    --input: 220 27% 16%;
+    --ring: 217 91% 60%;
+    --chart-1: 217 91% 60%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --gradient-start: 217 91% 60%;
+    --gradient-end: 200 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* Add subtle pattern background like in mockup */
+    background-image:
+      radial-gradient(circle at 25% 25%, hsl(220 27% 10%) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsl(220 27% 10%) 0%, transparent 50%);
+    background-size: 100px 100px;
+    background-position: 0 0, 50px 50px;
+  }
+}
+
+/* Optimizations for 7-inch 1024x600 touchscreen */
+@layer utilities {
+  /* Ensure proper touch targets for 7-inch screen */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text selection on touch interface */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Optimize for 1024x600 viewport */
+  @media (width: 1024px) and (height: 600px) {
+    .dashboard-optimized {
+      height: 600px;
+      overflow: hidden;
+    }
+  }
+
+  /* Custom gradient border card styling inspired by mockup */
+  .gradient-border-card {
+    position: relative;
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+    padding: 2px;
+    background: linear-gradient(135deg,
+      hsl(var(--gradient-start)) 0%,
+      hsl(var(--gradient-end)) 50%,
+      hsl(var(--gradient-start)) 100%);
+  }
+
+  .gradient-border-card::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    background: hsl(var(--card));
+    border-radius: calc(var(--radius) - 1px);
+    z-index: 1;
+  }
+
+  .gradient-border-card > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Hover effect for interactive cards */
+  .gradient-border-card:hover {
+    background: linear-gradient(135deg,
+      hsl(var(--gradient-start) / 0.8) 0%,
+      hsl(var(--gradient-end) / 0.8) 50%,
+      hsl(var(--gradient-start) / 0.8) 100%);
+    transform: translateY(-1px);
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Subtle glow effect */
+  .card-glow {
+    box-shadow:
+      0 0 20px hsl(var(--gradient-start) / 0.1),
+      0 4px 6px -1px hsl(220 27% 4% / 0.1),
+      0 2px 4px -1px hsl(220 27% 4% / 0.06);
+  }
+
+  .card-glow:hover {
+    box-shadow:
+      0 0 30px hsl(var(--gradient-start) / 0.2),
+      0 10px 15px -3px hsl(220 27% 4% / 0.1),
+      0 4px 6px -2px hsl(220 27% 4% / 0.05);
+  }
+}
