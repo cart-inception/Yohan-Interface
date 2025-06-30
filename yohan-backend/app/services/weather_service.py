@@ -5,13 +5,13 @@ from ..settings import settings
 
 OPENWEATHERMAP_API_URL = "https://api.openweathermap.org/data/3.0/onecall"
 
-async def get_weather_data(lat: float = 40.7128, lon: float = -74.0060) -> WeatherData:
+async def get_weather_data(lat: float = 41.5868, lon: float = -93.6250) -> WeatherData:
     """
-    Fetches weather data from the OpenWeatherMap API.
+    Fetches weather data from the OpenWeatherMap API for Des Moines, Iowa.
 
     Args:
-        lat: Latitude for the location.
-        lon: Longitude for the location.
+        lat: Latitude for the location (default: Des Moines, IA).
+        lon: Longitude for the location (default: Des Moines, IA).
 
     Returns:
         A WeatherData object containing the parsed weather information.
@@ -63,7 +63,8 @@ async def get_weather_data(lat: float = 40.7128, lon: float = -74.0060) -> Weath
             return WeatherData(
                 current=current_weather,
                 hourly=hourly_forecast,
-                daily=daily_forecast
+                daily=daily_forecast,
+                location="Des Moines, Iowa"
             )
 
         except httpx.HTTPStatusError as e:

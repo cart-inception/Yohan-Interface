@@ -109,6 +109,43 @@
     }
   }
 
+  /* Specific optimizations for 7-inch touchscreen */
+  @media (max-width: 1024px) and (max-height: 600px) {
+    .dashboard-optimized {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Compact calendar styling for small screen */
+    .calendar-container .rbc-header {
+      padding: 8px 4px;
+      font-size: 12px;
+    }
+
+    .calendar-container .rbc-date-cell {
+      padding: 4px;
+      font-size: 11px;
+    }
+
+    .calendar-container .rbc-event {
+      font-size: 10px;
+      padding: 1px 4px;
+    }
+
+    /* Compact weather cards */
+    .weather-detail-card {
+      padding: 8px !important;
+    }
+
+    .weather-detail-card .text-2xl {
+      font-size: 1.25rem !important;
+    }
+
+    .weather-detail-card .text-xl {
+      font-size: 1rem !important;
+    }
+  }
+
   /* Premium gradient border card styling matching mockup */
   .gradient-border-card {
     position: relative;
@@ -188,5 +225,149 @@
       0 6px 24px hsl(0 0% 0% / 0.4);
     transform: translateY(-2px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Consistent layout patterns for dedicated windows */
+  .window-container {
+    @apply w-full;
+  }
+
+  .section-header {
+    @apply text-xl font-semibold text-foreground;
+  }
+
+  .data-grid {
+    @apply grid gap-4;
+  }
+
+  /* React Big Calendar Dark Theme Overrides */
+  .calendar-container .rbc-calendar {
+    background-color: transparent;
+    color: hsl(var(--foreground));
+  }
+
+  .calendar-container .rbc-header {
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--foreground));
+    border-bottom: 1px solid hsl(var(--border));
+    padding: 12px 8px;
+    font-weight: 600;
+  }
+
+  .calendar-container .rbc-month-view,
+  .calendar-container .rbc-time-view {
+    background-color: transparent;
+    border: 1px solid hsl(var(--border) / 0.3);
+    border-radius: 8px;
+  }
+
+  .calendar-container .rbc-date-cell {
+    color: hsl(var(--muted-foreground));
+    padding: 8px;
+  }
+
+  .calendar-container .rbc-date-cell.rbc-off-range {
+    color: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  .calendar-container .rbc-date-cell.rbc-now {
+    background-color: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+    font-weight: 600;
+  }
+
+  .calendar-container .rbc-day-bg {
+    background-color: transparent;
+    border-right: 1px solid hsl(var(--border) / 0.2);
+    border-bottom: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  .calendar-container .rbc-day-bg.rbc-off-range-bg {
+    background-color: hsl(var(--muted) / 0.3);
+  }
+
+  .calendar-container .rbc-today {
+    background-color: hsl(var(--primary) / 0.05);
+  }
+
+  .calendar-container .rbc-event {
+    background-color: hsl(var(--primary));
+    border: none;
+    color: hsl(var(--primary-foreground));
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .calendar-container .rbc-event:hover {
+    background-color: hsl(var(--primary) / 0.9);
+  }
+
+  .calendar-container .rbc-event.rbc-selected {
+    background-color: hsl(var(--accent));
+  }
+
+  .calendar-container .rbc-show-more {
+    color: hsl(var(--primary));
+    font-weight: 500;
+  }
+
+  .calendar-container .rbc-month-row {
+    border-bottom: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  .calendar-container .rbc-time-header {
+    border-bottom: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  .calendar-container .rbc-time-content {
+    border-top: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  .calendar-container .rbc-time-slot {
+    border-top: 1px solid hsl(var(--border) / 0.1);
+    color: hsl(var(--muted-foreground));
+  }
+
+  .calendar-container .rbc-timeslot-group {
+    border-bottom: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  .calendar-container .rbc-current-time-indicator {
+    background-color: hsl(var(--primary));
+    height: 2px;
+  }
+
+  /* Smooth view transitions */
+  .view-transition {
+    animation: fadeInSlide 0.3s ease-in-out;
+  }
+
+  @keyframes fadeInSlide {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Enhanced navigation styling */
+  .nav-backdrop {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Improved button hover states */
+  .nav-button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .nav-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.2);
   }
 }

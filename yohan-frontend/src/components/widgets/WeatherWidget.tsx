@@ -78,8 +78,13 @@ export function WeatherWidget() {
         {/* Main weather display - Larger with more space */}
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-6xl font-bold mb-2 text-foreground">
-              {Math.round(current.temp)}°
+            <div className="flex items-baseline gap-3 mb-2">
+              <div className="text-6xl font-bold text-foreground">
+                {Math.round(current.temp)}°
+              </div>
+              <div className="text-lg text-muted-foreground font-medium">
+                {weatherData.location || 'Des Moines, IA'}
+              </div>
             </div>
             <div className="text-base text-muted-foreground capitalize">
               {current.description}
@@ -92,19 +97,41 @@ export function WeatherWidget() {
 
         {/* 5-day forecast - horizontal layout like mockup */}
         <div className="grid grid-cols-5 gap-2 text-center text-sm">
-          {weatherData.daily.slice(0, 5).map((day, index) => (
-            <div key={index} className="flex flex-col items-center space-y-1">
-              <div className="text-xs text-muted-foreground font-medium">
-                {index === 0 ? 'TODAY' : new Date(day.date).toLocaleDateString([], { weekday: 'short' }).toUpperCase()}
-              </div>
-              <div className="text-lg font-bold text-foreground">
-                {Math.round(day.max_temp)}°
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {Math.round(day.min_temp)}°
-              </div>
-            </div>
-          ))}
+          {/* Filter to start from today and show next 5 days */}
+          {(() => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time for accurate comparison
+
+            // Find today's index in the daily array
+            const todayIndex = weatherData.daily.findIndex(day => {
+              const dayDate = new Date(day.date);
+              dayDate.setHours(0, 0, 0, 0);
+              return dayDate.getTime() === today.getTime();
+            });
+
+            // If today is found, start from today, otherwise start from first available day
+            const startIndex = todayIndex >= 0 ? todayIndex : 0;
+            const forecastDays = weatherData.daily.slice(startIndex, startIndex + 5);
+
+            return forecastDays.map((day, index) => {
+              const dayDate = new Date(day.date);
+              const isToday = index === 0 && todayIndex >= 0; // First day in our filtered array and we found today
+
+              return (
+                <div key={`${day.date}-${index}`} className="flex flex-col items-center space-y-1">
+                  <div className="text-xs text-muted-foreground font-medium">
+                    {isToday ? 'TODAY' : dayDate.toLocaleDateString([], { weekday: 'short' }).toUpperCase()}
+                  </div>
+                  <div className="text-lg font-bold text-foreground">
+                    {Math.round(day.max_temp)}°
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {Math.round(day.min_temp)}°
+                  </div>
+                </div>
+              );
+            });
+          })()}
         </div>
       </CardContent>
     </Card>

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from datetime import datetime, date
 
 class CurrentWeather(BaseModel):
@@ -26,3 +26,4 @@ class WeatherData(BaseModel):
     current: CurrentWeather
     hourly: List[HourlyForecast]
     daily: List[ForecastDay]
+    location: Optional[str] = "Des Moines, Iowa"

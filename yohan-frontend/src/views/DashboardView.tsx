@@ -26,7 +26,10 @@ export function DashboardView() {
             {/* Top Row - Weather and Clock side by side */}
             <div className="grid grid-cols-3 gap-6 h-full min-h-0">
               {/* Weather Widget - Takes 2/3 of top row */}
-              <div className="col-span-2 cursor-pointer touch-target h-full min-h-0" onClick={() => setCurrentView('weather')}>
+              <div
+                className="col-span-2 cursor-pointer touch-target h-full min-h-0 transition-all duration-200 hover:scale-[1.02] hover:z-10"
+                onClick={() => setCurrentView('weather')}
+              >
                 <WeatherWidget />
               </div>
 
@@ -39,13 +42,16 @@ export function DashboardView() {
             {/* Bottom Row - Events and Chat side by side */}
             <div className="grid grid-cols-3 gap-6 h-full min-h-0">
               {/* Upcoming Events Widget - Takes 2/3 of bottom row */}
-              <div className="col-span-2 cursor-pointer touch-target h-full min-h-0" onClick={() => setCurrentView('calendar')}>
+              <div
+                className="col-span-2 cursor-pointer touch-target h-full min-h-0 transition-all duration-200 hover:scale-[1.02] hover:z-10"
+                onClick={() => setCurrentView('calendar')}
+              >
                 <UpcomingEventsWidget />
               </div>
 
               {/* Chat Access Widget - Takes 1/3 of bottom row */}
               <div
-                className="cursor-pointer touch-target h-full min-h-0"
+                className="cursor-pointer touch-target h-full min-h-0 transition-all duration-200 hover:scale-[1.02] hover:z-10"
                 onClick={() => setCurrentView('chat')}
               >
                 <div className="h-full relative rounded-2xl bg-card text-card-foreground border-2 border-transparent bg-gradient-to-br from-blue-500/50 via-blue-400/30 to-blue-500/50 p-[2px] card-glow transition-all duration-200">

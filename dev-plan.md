@@ -89,9 +89,9 @@ This document provides a highly detailed, phased development plan. Each task is 
   - [x] 3.1.4: Create `src/components/widgets/UpcomingEventsWidget.tsx`. It should read from the store, map over the next few events, and display them in a list.
 
 - **3.2: Dedicated Views**
-  - [ ] 3.2.1: Create `src/views/WeatherView.tsx`. Build a more detailed view with hourly and daily forecast components, using data from the store.
-  - [ ] 3.2.2: Create `src/views/CalendarView.tsx`. Integrate a full calendar component (e.g., `react-big-calendar`) and populate it with events.
-  - [ ] 3.2.3: Implement a simple routing or state-based mechanism in `App.tsx` to switch between the dashboard and the dedicated views.
+  - [x] 3.2.1: Create `src/views/WeatherView.tsx`. Build a more detailed view with hourly and daily forecast components, using data from the store.
+  - [x] 3.2.2: Create `src/views/CalendarView.tsx`. Integrate a full calendar component (e.g., `react-big-calendar`) and populate it with events.
+  - [x] 3.2.3: Implement a simple routing or state-based mechanism in `App.tsx` to switch between the dashboard and the dedicated views.
 
 - **3.3: LLM Chat Integration**
   - [ ] 3.3.1: (Backend) Add `anthropic` to `requirements.txt`. Create `app/services/llm_service.py` to handle communication with the Anthropic API.

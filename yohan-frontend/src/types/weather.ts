@@ -27,4 +27,5 @@ export interface WeatherData {
   current: CurrentWeather;
   hourly: HourlyForecast[];
   daily: ForecastDay[];
+  location?: string; // Optional location field
 }

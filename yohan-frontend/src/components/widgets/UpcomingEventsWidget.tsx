@@ -42,32 +42,7 @@ export function UpcomingEventsWidget() {
     );
   }
 
-  // Helper function to format event time
-  const formatEventTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    const isToday = date.toDateString() === now.toDateString();
-    const isTomorrow = date.toDateString() === tomorrow.toDateString();
-    
-    const timeString = date.toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-    
-    if (isToday) {
-      return `Today at ${timeString}`;
-    } else if (isTomorrow) {
-      return `Tomorrow at ${timeString}`;
-    } else {
-      return `${date.toLocaleDateString([], { 
-        month: 'short', 
-        day: 'numeric' 
-      })} at ${timeString}`;
-    }
-  };
+
 
   return (
     <Card className="h-full transition-all duration-200">
