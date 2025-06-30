@@ -7,10 +7,10 @@ export function UpcomingEventsWidget() {
   if (isLoading) {
     return (
       <Card className="h-full transition-all duration-200">
-        <CardHeader className="pb-4 p-6">
+        <CardHeader className="pb-4">
           <CardTitle className="text-lg text-foreground">Calendar</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-32 p-6">
+        <CardContent className="flex items-center justify-center h-32">
           <div className="text-muted-foreground">Loading events...</div>
         </CardContent>
       </Card>
@@ -26,13 +26,13 @@ export function UpcomingEventsWidget() {
   if (upcomingEvents.length === 0) {
     return (
       <Card className="h-full transition-all duration-200">
-        <CardHeader className="pb-4 p-6">
+        <CardHeader className="pb-4">
           <CardTitle className="text-lg text-foreground">Calendar</CardTitle>
           <div className="text-base text-muted-foreground">
             {new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
           </div>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-32 p-6">
+        <CardContent className="flex items-center justify-center h-32">
           <div className="text-muted-foreground text-center">
             <p>No upcoming events</p>
             <p className="text-sm">Tap to view calendar</p>
@@ -71,13 +71,13 @@ export function UpcomingEventsWidget() {
 
   return (
     <Card className="h-full transition-all duration-200">
-      <CardHeader className="pb-4 p-6">
+      <CardHeader className="pb-4">
         <CardTitle className="text-lg text-foreground">Calendar</CardTitle>
         <div className="text-base text-muted-foreground">
           {new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
         </div>
       </CardHeader>
-      <CardContent className="space-y-3 p-6 pt-0">
+      <CardContent className="space-y-3">
         {upcomingEvents.slice(0, 3).map((event, index) => (
           <div key={index} className="flex items-center space-x-3 py-2">
             <div className="text-sm text-muted-foreground min-w-[80px]">

@@ -4,58 +4,59 @@
 
 @layer base {
   :root {
-    /* Dark theme inspired by the mockup */
-    --background: 220 27% 8%;
+    /* Ultra dark theme matching the mockup */
+    --background: 0 0% 4%;
     --foreground: 210 40% 98%;
-    --card: 220 27% 12%;
+    --card: 220 13% 9%;
     --card-foreground: 210 40% 98%;
-    --popover: 220 27% 12%;
+    --popover: 220 13% 9%;
     --popover-foreground: 210 40% 98%;
     --primary: 217 91% 60%;
-    --primary-foreground: 220 27% 8%;
-    --secondary: 220 27% 16%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 220 13% 12%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 220 27% 16%;
+    --muted: 220 13% 12%;
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 217 91% 60%;
-    --accent-foreground: 220 27% 8%;
+    --accent-foreground: 0 0% 4%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217 91% 60%;
-    --input: 220 27% 16%;
+    --input: 220 13% 12%;
     --ring: 217 91% 60%;
     --chart-1: 217 91% 60%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Custom gradient colors for borders */
+    /* Enhanced gradient colors for premium borders */
     --gradient-start: 217 91% 60%;
-    --gradient-end: 200 91% 60%;
+    --gradient-mid: 200 91% 65%;
+    --gradient-end: 217 91% 60%;
   }
 
   .dark {
-    /* Keep same values for dark mode since we're using dark theme by default */
-    --background: 220 27% 8%;
+    /* Keep same ultra dark values for dark mode */
+    --background: 0 0% 4%;
     --foreground: 210 40% 98%;
-    --card: 220 27% 12%;
+    --card: 220 13% 9%;
     --card-foreground: 210 40% 98%;
-    --popover: 220 27% 12%;
+    --popover: 220 13% 9%;
     --popover-foreground: 210 40% 98%;
     --primary: 217 91% 60%;
-    --primary-foreground: 220 27% 8%;
-    --secondary: 220 27% 16%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 220 13% 12%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 220 27% 16%;
+    --muted: 220 13% 12%;
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 217 91% 60%;
-    --accent-foreground: 220 27% 8%;
+    --accent-foreground: 0 0% 4%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217 91% 60%;
-    --input: 220 27% 16%;
+    --input: 220 13% 12%;
     --ring: 217 91% 60%;
     --chart-1: 217 91% 60%;
     --chart-2: 160 60% 45%;
@@ -63,7 +64,8 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --gradient-start: 217 91% 60%;
-    --gradient-end: 200 91% 60%;
+    --gradient-mid: 200 91% 65%;
+    --gradient-end: 217 91% 60%;
   }
 }
 
@@ -73,12 +75,13 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Add subtle pattern background like in mockup */
-    background-image:
-      radial-gradient(circle at 25% 25%, hsl(220 27% 10%) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, hsl(220 27% 10%) 0%, transparent 50%);
-    background-size: 100px 100px;
-    background-position: 0 0, 50px 50px;
+    /* Ultra dark background with subtle geometric pattern like mockup */
+    background:
+      linear-gradient(135deg, transparent 35%, hsl(0 0% 2% / 0.3) 35%, hsl(0 0% 2% / 0.3) 65%, transparent 65%),
+      linear-gradient(45deg, transparent 35%, hsl(0 0% 2% / 0.3) 35%, hsl(0 0% 2% / 0.3) 65%, transparent 65%),
+      hsl(var(--background));
+    background-size: 60px 60px, 60px 60px, 100% 100%;
+    background-position: 0 0, 30px 30px, 0 0;
   }
 }
 
@@ -106,24 +109,39 @@
     }
   }
 
-  /* Custom gradient border card styling inspired by mockup */
+  /* Premium gradient border card styling matching mockup */
   .gradient-border-card {
     position: relative;
-    background: hsl(var(--card));
     border-radius: var(--radius);
-    padding: 2px;
-    background: linear-gradient(135deg,
-      hsl(var(--gradient-start)) 0%,
-      hsl(var(--gradient-end)) 50%,
-      hsl(var(--gradient-start)) 100%);
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
   }
 
   .gradient-border-card::before {
     content: '';
     position: absolute;
-    inset: 1px;
+    inset: 0;
+    padding: 2px;
+    background: linear-gradient(135deg,
+      hsl(var(--gradient-start)) 0%,
+      hsl(var(--gradient-mid)) 25%,
+      hsl(var(--gradient-end)) 50%,
+      hsl(var(--gradient-mid)) 75%,
+      hsl(var(--gradient-start)) 100%);
+    border-radius: var(--radius);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+  }
+
+  .gradient-border-card::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
     background: hsl(var(--card));
-    border-radius: calc(var(--radius) - 1px);
+    border-radius: calc(var(--radius) - 2px);
     z-index: 1;
   }
 
@@ -132,28 +150,43 @@
     z-index: 2;
   }
 
-  /* Hover effect for interactive cards */
-  .gradient-border-card:hover {
+  /* Enhanced hover effect for interactive cards */
+  .gradient-border-card:hover::before {
     background: linear-gradient(135deg,
-      hsl(var(--gradient-start) / 0.8) 0%,
-      hsl(var(--gradient-end) / 0.8) 50%,
-      hsl(var(--gradient-start) / 0.8) 100%);
-    transform: translateY(-1px);
-    transition: all 0.2s ease-in-out;
+      hsl(var(--gradient-start) / 0.9) 0%,
+      hsl(var(--gradient-mid) / 0.9) 25%,
+      hsl(var(--gradient-end) / 0.9) 50%,
+      hsl(var(--gradient-mid) / 0.9) 75%,
+      hsl(var(--gradient-start) / 0.9) 100%);
+    animation: borderGlow 2s ease-in-out infinite alternate;
   }
 
-  /* Subtle glow effect */
+  .gradient-border-card:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes borderGlow {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; }
+  }
+
+  /* Premium glow effect matching mockup */
   .card-glow {
     box-shadow:
-      0 0 20px hsl(var(--gradient-start) / 0.1),
-      0 4px 6px -1px hsl(220 27% 4% / 0.1),
-      0 2px 4px -1px hsl(220 27% 4% / 0.06);
+      0 0 30px hsl(217 91% 60% / 0.2),
+      0 0 15px hsl(217 91% 60% / 0.1),
+      0 8px 32px hsl(0 0% 0% / 0.5),
+      0 4px 16px hsl(0 0% 0% / 0.3);
   }
 
   .card-glow:hover {
     box-shadow:
-      0 0 30px hsl(var(--gradient-start) / 0.2),
-      0 10px 15px -3px hsl(220 27% 4% / 0.1),
-      0 4px 6px -2px hsl(220 27% 4% / 0.05);
+      0 0 50px hsl(217 91% 60% / 0.3),
+      0 0 25px hsl(217 91% 60% / 0.2),
+      0 12px 48px hsl(0 0% 0% / 0.6),
+      0 6px 24px hsl(0 0% 0% / 0.4);
+    transform: translateY(-2px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }

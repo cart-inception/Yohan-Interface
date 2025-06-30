@@ -48,27 +48,29 @@ export function DashboardView() {
                 className="cursor-pointer touch-target h-full min-h-0"
                 onClick={() => setCurrentView('chat')}
               >
-                <div className="h-full gradient-border-card card-glow p-6 transition-all duration-200">
-                  <div className="flex flex-col items-center justify-center h-full text-center">
-                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-4">
-                      <svg
-                        className="w-8 h-8 text-primary"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                        />
-                      </svg>
+                <div className="h-full relative rounded-2xl bg-card text-card-foreground border-2 border-transparent bg-gradient-to-br from-blue-500/50 via-blue-400/30 to-blue-500/50 p-[2px] card-glow transition-all duration-200">
+                  <div className="h-full w-full rounded-xl bg-card p-6">
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                      <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-4">
+                        <svg
+                          className="w-8 h-8 text-primary"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2 text-foreground">AI Assistant</h3>
+                      <p className="text-sm text-muted-foreground">
+                        How can I assist you today?
+                      </p>
                     </div>
-                    <h3 className="text-xl font-semibold mb-2 text-foreground">AI Assistant</h3>
-                    <p className="text-sm text-muted-foreground">
-                      How can I assist you today?
-                    </p>
                   </div>
                 </div>
               </div>

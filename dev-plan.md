@@ -83,10 +83,10 @@ This document provides a highly detailed, phased development plan. Each task is 
 **Goal:** Build the primary UI views and integrate the LLM for chat functionality.
 
 - **3.1: Main Dashboard View**
-  - [ ] 3.1.1: Create `src/views/DashboardView.tsx`. Use Tailwind CSS grid to create the main layout.
-  - [ ] 3.1.2: Create `src/components/widgets/ClockWidget.tsx`. Use a `useEffect` hook with an interval to keep the time updated.
-  - [ ] 3.1.3: Create `src/components/widgets/WeatherWidget.tsx`. It should read from the Zustand store and display the current temperature and conditions in a `Card` component.
-  - [ ] 3.1.4: Create `src/components/widgets/UpcomingEventsWidget.tsx`. It should read from the store, map over the next few events, and display them in a list.
+  - [x] 3.1.1: Create `src/views/DashboardView.tsx`. Use Tailwind CSS grid to create the main layout.
+  - [x] 3.1.2: Create `src/components/widgets/ClockWidget.tsx`. Use a `useEffect` hook with an interval to keep the time updated.
+  - [x] 3.1.3: Create `src/components/widgets/WeatherWidget.tsx`. It should read from the Zustand store and display the current temperature and conditions in a `Card` component.
+  - [x] 3.1.4: Create `src/components/widgets/UpcomingEventsWidget.tsx`. It should read from the store, map over the next few events, and display them in a list.
 
 - **3.2: Dedicated Views**
   - [ ] 3.2.1: Create `src/views/WeatherView.tsx`. Build a more detailed view with hourly and daily forecast components, using data from the store.

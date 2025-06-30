@@ -37,7 +37,7 @@ export function ClockWidget() {
 
   return (
     <Card className="h-full transition-all duration-200">
-      <CardContent className="p-6 flex flex-col justify-center h-full">
+      <CardContent className="flex flex-col justify-center h-full">
         <div className="text-center">
           {/* Time Display - Positioned like in mockup */}
           <div className="text-4xl font-bold text-foreground mb-4 font-mono">

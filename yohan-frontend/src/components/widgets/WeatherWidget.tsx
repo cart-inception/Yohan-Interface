@@ -7,10 +7,10 @@ export function WeatherWidget() {
   if (isLoading) {
     return (
       <Card className="h-full transition-all duration-200">
-        <CardHeader className="pb-4 p-6">
+        <CardHeader className="pb-4">
           <CardTitle className="text-lg text-foreground">Weather</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-32 p-6">
+        <CardContent className="flex items-center justify-center h-32">
           <div className="text-muted-foreground">Loading...</div>
         </CardContent>
       </Card>
@@ -20,10 +20,10 @@ export function WeatherWidget() {
   if (!weatherData) {
     return (
       <Card className="h-full transition-all duration-200">
-        <CardHeader className="pb-4 p-6">
+        <CardHeader className="pb-4">
           <CardTitle className="text-lg text-foreground">Weather</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-32 p-6">
+        <CardContent className="flex items-center justify-center h-32">
           <div className="text-muted-foreground text-center">
             <p>No weather data</p>
             <p className="text-sm">Tap to view details</p>
@@ -39,10 +39,10 @@ export function WeatherWidget() {
   if (!current) {
     return (
       <Card className="h-full transition-all duration-200">
-        <CardHeader className="pb-4 p-6">
+        <CardHeader className="pb-4">
           <CardTitle className="text-lg text-foreground">Weather</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-32 p-6">
+        <CardContent className="flex items-center justify-center h-32">
           <div className="text-muted-foreground text-center">
             <p>Weather data loading...</p>
           </div>
@@ -71,10 +71,10 @@ export function WeatherWidget() {
 
   return (
     <Card className="h-full transition-all duration-200">
-      <CardHeader className="pb-4 p-6">
+      <CardHeader className="pb-4">
         <CardTitle className="text-lg text-foreground">Weather</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 p-6 pt-0">
+      <CardContent className="space-y-4">
         {/* Main weather display - Larger with more space */}
         <div className="flex items-center justify-between">
           <div>
