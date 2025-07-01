@@ -94,11 +94,75 @@ This document provides a highly detailed, phased development plan. Each task is 
   - [x] 3.2.3: Implement a simple routing or state-based mechanism in `App.tsx` to switch between the dashboard and the dedicated views.
 
 - **3.3: LLM Chat Integration**
-  - [ ] 3.3.1: (Backend) Add `anthropic` to `requirements.txt`. Create `app/services/llm_service.py` to handle communication with the Anthropic API.
-  - [ ] 3.3.2: (Backend) In the WebSocket endpoint, when a message of type `llm_query` is received, pass the text to the `llm_service` and broadcast the response.
-  - [ ] 3.3.3: (Frontend) Create `src/views/ChatView.tsx`.
-  - [ ] 3.3.4: (Frontend) Build `src/components/ChatMessage.tsx` to display individual messages (user vs. AI).
-  - [ ] 3.3.5: (Frontend) Build an input form in `ChatView` that, on submit, sends the message via the WebSocket and updates the `chatHistory` in the store.
+
+  **Goal:** Integrate Anthropic's Claude API to provide intelligent chat functionality with context-aware responses.
+
+  - **3.3.1: Set Up Anthropic Integration**
+    - [x] 3.3.1.1: Add anthropic to requirements.txt and install with pip install -r requirements.txt.
+    - [x] 3.3.1.2: Create app/schemas/llm.py to define Pydantic models for LLM requests and responses.
+    - [x] 3.3.1.3: Add ANTHROPIC_API_KEY to .env and update app/settings.py to load this environment variable.
+    - [x] 3.3.1.4: Create a test script scripts/test_anthropic.py to verify API key and basic functionality.
+
+  - **3.3.2: Implement LLM Service**
+    - [x] 3.3.2.1: Create app/services/llm_service.py with an LLMService class.
+    - [x] 3.3.2.2: Implement a method to initialize the Anthropic client with the API key.
+    - [x] 3.3.2.3: Create a system prompt that defines Yohan's personality and capabilities.
+    - [x] 3.3.2.4: Implement an async generate_response method that accepts user messages and optional context.
+    - [x] 3.3.2.5: Add context-enrichment logic to include current weather and upcoming events in prompts.
+    - [x] 3.3.2.6: Implement error handling and rate limiting to manage API usage.
+    - [x] 3.3.2.7: Add logging for debugging and monitoring purposes.
+
+  - **3.3.3: Integrate with WebSocket Handler**
+    - [x] 3.3.3.1: Update app/schemas/websockets.py to include new message types for LLM queries and responses.
+    - [x] 3.3.3.2: Modify app/routers/comms.py to handle messages with event_type: "llm_query".
+    - [x] 3.3.3.3: When an LLM query is received, gather context from weather and calendar services.
+    - [x] 3.3.3.4: Call the LLM service with the user's message and context data.
+    - [x] 3.3.3.5: Broadcast the response to all connected clients with event_type: "llm_response".
+    - [x] 3.3.3.6: Implement a message queue if needed to handle multiple concurrent requests.
+
+  - **3.3.4: Create Chat Interface Components**
+    - [ ] 3.3.4.1: Install additional shadcn/ui components: npx shadcn-ui@latest add input scroll-area.
+    - [ ] 3.3.4.2: Create src/types/chat.ts to define TypeScript interfaces for chat messages and WebSocket payloads.
+    - [ ] 3.3.4.3: Update the Zustand store in src/store/appStore.ts to include chat history state and actions.
+    - [ ] 3.3.4.4: Create src/components/ChatMessage.tsx to render individual messages with appropriate styling.
+    - [ ] 3.3.4.5: Implement different visual styles for user messages vs. assistant responses.
+    - [ ] 3.3.4.6: Add timestamp display and any other metadata visualization needed.
+
+  - **3.3.5: Build Chat View**
+    - [ ] 3.3.5.1: Create src/views/ChatView.tsx as a new full-screen view.
+    - [ ] 3.3.5.2: Implement a message container with scrolling capability using shadcn's ScrollArea.
+    - [ ] 3.3.5.3: Add auto-scrolling behavior to keep the most recent messages visible.
+    - [ ] 3.3.5.4: Create an input form with text field and send button using shadcn components.
+    - [ ] 3.3.5.5: Implement form submission logic to send messages via WebSocket.
+    - [ ] 3.3.5.6: Add visual feedback for connection status and message sending state.
+    - [ ] 3.3.5.7: Implement loading indicators for when the LLM is generating a response.
+
+  - **3.3.6: WebSocket Integration**
+    - [ ] 3.3.6.1: Update src/hooks/useAppWebSocket.ts to handle LLM-related message types.
+    - [ ] 3.3.6.2: Create a sendChatMessage function that formats and sends LLM queries.
+    - [ ] 3.3.6.3: Implement handlers for llm_response messages to update the chat history in the store.
+    - [ ] 3.3.6.4: Add reconnection logic to handle WebSocket disconnections gracefully.
+    - [ ] 3.3.6.5: Implement message queuing for offline scenarios or connection issues.
+
+  - **3.3.7: App Navigation Updates**
+    - [ ] 3.3.7.1: Update App.tsx to include the new ChatView in the view switching logic.
+    - [ ] 3.3.7.2: Add a navigation button or icon for the chat interface.
+    - [ ] 3.3.7.3: Consider adding a chat notification indicator for new messages.
+    - [ ] 3.3.7.4: Implement keyboard shortcuts for quick access to the chat view.
+
+  - **3.3.8: Testing**
+    - [ ] 3.3.8.1: Create unit tests for the LLM service using pytest.
+    - [ ] 3.3.8.2: Test the WebSocket communication with mock clients.
+    - [ ] 3.3.8.3: Verify that context from weather and calendar is correctly included in prompts.
+    - [ ] 3.3.8.4: Test error handling and edge cases (API failures, malformed messages).
+    - [ ] 3.3.8.5: Perform end-to-end testing of the complete chat flow.
+
+  - **3.3.9: Refinement**
+    - [ ] 3.3.9.1: Optimize the system prompt based on testing results.
+    - [ ] 3.3.9.2: Fine-tune the UI for better usability and aesthetics.
+    - [ ] 3.3.9.3: Implement message persistence to maintain chat history across sessions.
+    - [ ] 3.3.9.4: Add the ability to clear chat history.
+    - [ ] 3.3.9.5: Consider implementing typing indicators or other dynamic feedback.
 
 ---
 

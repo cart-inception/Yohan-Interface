@@ -1,0 +1,307 @@
+import logging
+import asyncio
+from datetime import datetime, timezone, timedelta
+from typing import List, Optional, Dict, Any
+from anthropic import Anthropic, APIError, RateLimitError, APIConnectionError
+from anthropic.types import Message
+
+from ..schemas.llm import LLMRequest, LLMResponse, LLMError, LLMContext, LLMMessage
+from ..schemas.weather import WeatherData
+from ..schemas.calendar import CalendarEvent
+from ..settings import settings
+
+# Configure logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# Create console handler if not already configured
+if not logger.handlers:
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
+class LLMService:
+    """Service for handling LLM interactions with Anthropic's Claude API"""
+
+    def __init__(self):
+        """Initialize the LLM service with Anthropic client"""
+        self.client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        self.model = "claude-3-haiku-20240307"  # Fast, cost-effective model
+        self.max_tokens = 1000
+        self.temperature = 0.7
+
+        # Rate limiting
+        self.request_count = 0
+        self.request_window_start = datetime.now()
+        self.max_requests_per_minute = 50  # Conservative limit
+        self.retry_attempts = 3
+        self.base_retry_delay = 1.0  # seconds
+        
+        # System prompt defining Yohan's personality and capabilities
+        self.system_prompt = """You are Yohan, an intelligent assistant for a smart calendar display running on a Raspberry Pi touchscreen. You are helpful, friendly, and concise in your responses.
+
+Your capabilities include:
+- Providing information about weather conditions and forecasts
+- Helping with calendar events and scheduling
+- Answering general questions
+- Providing time and date information
+- Offering helpful suggestions based on current context
+
+Your personality:
+- Warm and approachable
+- Efficient and to-the-point
+- Proactive in offering relevant information
+- Considerate of the user's time and needs
+
+When responding:
+- Keep responses concise but informative
+- Use the provided context (weather, calendar events) when relevant
+- Be helpful and anticipate user needs
+- If you don't have specific information, be honest about limitations
+- Focus on being practical and useful for daily planning
+
+Current context will be provided with each request, including weather data and upcoming calendar events when available."""
+
+    async def generate_response(
+        self, 
+        message: str, 
+        context: Optional[LLMContext] = None,
+        conversation_history: Optional[List[LLMMessage]] = None
+    ) -> LLMResponse:
+        """
+        Generate a response using Claude API with context enrichment
+        
+        Args:
+            message: User's message/question
+            context: Optional context including weather and calendar data
+            conversation_history: Optional previous conversation messages
+            
+        Returns:
+            LLMResponse object with the generated response
+        """
+        try:
+            # Build the enriched prompt
+            enriched_prompt = self._build_enriched_prompt(message, context)
+            
+            # Prepare conversation messages
+            messages = []
+            
+            # Add conversation history if provided
+            if conversation_history:
+                for hist_msg in conversation_history[-10:]:  # Keep last 10 messages
+                    messages.append({
+                        "role": hist_msg.role,
+                        "content": hist_msg.content
+                    })
+            
+            # Add current message
+            messages.append({
+                "role": "user",
+                "content": enriched_prompt
+            })
+            
+            logger.info(f"Sending request to Claude API with {len(messages)} messages")
+
+            # Check rate limiting before making request
+            await self._check_rate_limit()
+
+            # Make API call to Claude with retry logic
+            response: Message = await self._make_api_call_with_retry(messages)
+            
+            # Extract response content
+            response_content = response.content[0].text if response.content else ""
+            
+            logger.info(f"Received response from Claude API: {len(response_content)} characters")
+            
+            return LLMResponse(
+                content=response_content,
+                usage={
+                    "input_tokens": response.usage.input_tokens,
+                    "output_tokens": response.usage.output_tokens,
+                    "total_tokens": response.usage.input_tokens + response.usage.output_tokens
+                },
+                model=response.model,
+                finish_reason=response.stop_reason,
+                timestamp=datetime.now(timezone.utc)
+            )
+            
+        except Exception as e:
+            logger.error(f"Error generating LLM response: {str(e)}")
+            raise self._create_llm_error("generation_error", str(e), {"original_message": message})
+
+    def _build_enriched_prompt(self, message: str, context: Optional[LLMContext] = None) -> str:
+        """
+        Build an enriched prompt with context information
+        
+        Args:
+            message: Original user message
+            context: Context data to include
+            
+        Returns:
+            Enriched prompt string
+        """
+        prompt_parts = []
+        
+        # Add current time context
+        current_time = datetime.now()
+        prompt_parts.append(f"Current time: {current_time.strftime('%A, %B %d, %Y at %I:%M %p')}")
+        
+        # Add weather context if available
+        if context and context.weather_data:
+            weather_info = self._format_weather_context(context.weather_data)
+            if weather_info:
+                prompt_parts.append(f"Current weather: {weather_info}")
+        
+        # Add calendar context if available
+        if context and context.calendar_events:
+            calendar_info = self._format_calendar_context(context.calendar_events)
+            if calendar_info:
+                prompt_parts.append(f"Upcoming events: {calendar_info}")
+        
+        # Add location context if available
+        if context and context.location:
+            prompt_parts.append(f"Location: {context.location}")
+        
+        # Add the user's message
+        prompt_parts.append(f"User question: {message}")
+        
+        return "\n\n".join(prompt_parts)
+
+    def _format_weather_context(self, weather_data: Dict[str, Any]) -> str:
+        """Format weather data for context inclusion"""
+        try:
+            current = weather_data.get('current', {})
+            if not current:
+                return ""
+            
+            temp = current.get('temp', 'N/A')
+            description = current.get('description', 'N/A')
+            humidity = current.get('humidity', 'N/A')
+            wind_speed = current.get('wind_speed', 'N/A')
+            
+            return f"{temp}°F, {description}, humidity {humidity}%, wind {wind_speed} mph"
+        except Exception as e:
+            logger.warning(f"Error formatting weather context: {e}")
+            return ""
+
+    def _format_calendar_context(self, calendar_events: List[Dict[str, Any]]) -> str:
+        """Format calendar events for context inclusion"""
+        try:
+            if not calendar_events:
+                return "No upcoming events"
+            
+            # Format next 3 events
+            event_strings = []
+            for event in calendar_events[:3]:
+                summary = event.get('summary', 'Untitled Event')
+                start_time = event.get('start_time', '')
+                
+                if start_time:
+                    # Parse the datetime string if it's a string
+                    if isinstance(start_time, str):
+                        try:
+                            start_dt = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+                        except:
+                            start_dt = None
+                    else:
+                        start_dt = start_time
+                    
+                    if start_dt:
+                        time_str = start_dt.strftime('%m/%d at %I:%M %p')
+                        event_strings.append(f"{summary} ({time_str})")
+                    else:
+                        event_strings.append(summary)
+                else:
+                    event_strings.append(summary)
+            
+            return "; ".join(event_strings)
+        except Exception as e:
+            logger.warning(f"Error formatting calendar context: {e}")
+            return ""
+
+    async def _check_rate_limit(self):
+        """Check and enforce rate limiting"""
+        now = datetime.now()
+
+        # Reset counter if window has passed
+        if now - self.request_window_start > timedelta(minutes=1):
+            self.request_count = 0
+            self.request_window_start = now
+
+        # Check if we've exceeded the rate limit
+        if self.request_count >= self.max_requests_per_minute:
+            wait_time = 60 - (now - self.request_window_start).total_seconds()
+            if wait_time > 0:
+                logger.warning(f"Rate limit reached, waiting {wait_time:.1f} seconds")
+                await asyncio.sleep(wait_time)
+                self.request_count = 0
+                self.request_window_start = datetime.now()
+
+        self.request_count += 1
+
+    async def _make_api_call_with_retry(self, messages: List[Dict[str, str]]) -> Message:
+        """Make API call with exponential backoff retry logic"""
+        last_exception = None
+
+        for attempt in range(self.retry_attempts):
+            try:
+                response = self.client.messages.create(
+                    model=self.model,
+                    max_tokens=self.max_tokens,
+                    temperature=self.temperature,
+                    system=self.system_prompt,
+                    messages=messages
+                )
+                return response
+
+            except RateLimitError as e:
+                logger.warning(f"Rate limit error on attempt {attempt + 1}: {e}")
+                if attempt < self.retry_attempts - 1:
+                    delay = self.base_retry_delay * (2 ** attempt)
+                    logger.info(f"Retrying in {delay} seconds...")
+                    await asyncio.sleep(delay)
+                last_exception = e
+
+            except APIConnectionError as e:
+                logger.warning(f"Connection error on attempt {attempt + 1}: {e}")
+                if attempt < self.retry_attempts - 1:
+                    delay = self.base_retry_delay * (2 ** attempt)
+                    logger.info(f"Retrying in {delay} seconds...")
+                    await asyncio.sleep(delay)
+                last_exception = e
+
+            except APIError as e:
+                logger.error(f"API error on attempt {attempt + 1}: {e}")
+                # Don't retry on API errors (usually client-side issues)
+                raise e
+
+            except Exception as e:
+                logger.error(f"Unexpected error on attempt {attempt + 1}: {e}")
+                if attempt < self.retry_attempts - 1:
+                    delay = self.base_retry_delay * (2 ** attempt)
+                    logger.info(f"Retrying in {delay} seconds...")
+                    await asyncio.sleep(delay)
+                last_exception = e
+
+        # If we've exhausted all retries, raise the last exception
+        if last_exception:
+            raise last_exception
+        else:
+            raise Exception("All retry attempts failed")
+
+    def _create_llm_error(self, error_type: str, message: str, details: Optional[Dict[str, Any]] = None) -> Exception:
+        """Create a standardized LLM error"""
+        error = LLMError(
+            error_type=error_type,
+            message=message,
+            details=details or {},
+            timestamp=datetime.now(timezone.utc)
+        )
+        return Exception(f"LLM Error ({error_type}): {message}")
+
+# Global service instance
+llm_service = LLMService()
