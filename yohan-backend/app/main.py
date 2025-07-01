@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import settings
-from .routers import weather, calendar, comms
+from .routers import weather, calendar, comms, chat
 
 app = FastAPI(title="Yohan Backend")
 
@@ -24,6 +24,7 @@ app.add_middleware(
 # Include API routers
 app.include_router(weather.router, prefix="/api")
 app.include_router(calendar.router, prefix="/api")
+app.include_router(chat.router, prefix="/api")
 
 # Include WebSocket router
 app.include_router(comms.router)

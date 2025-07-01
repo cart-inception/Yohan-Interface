@@ -21,12 +21,7 @@ export interface LLMResponseMessage extends WebSocketMessage {
   };
 }
 
-export interface ChatMessage {
-  id: string;
-  content: string;
-  timestamp: string;
-  sender: 'user' | 'assistant';
-}
+
 
 // Union type for all possible WebSocket messages
 export type AppWebSocketMessage = VoiceStatusMessage | LLMResponseMessage | WebSocketMessage;

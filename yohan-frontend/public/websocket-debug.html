@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .connected { background-color: #2d5a2d; }
+        .disconnected { background-color: #5a2d2d; }
+        .connecting { background-color: #5a5a2d; }
+        .log {
+            background-color: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        button {
+            background-color: #4a4a4a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #5a5a5a;
+        }
+        input {
+            background-color: #3a3a3a;
+            color: white;
+            border: 1px solid #5a5a5a;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Debug Test</h1>
+    <p>This page tests the WebSocket connection to the Yohan backend.</p>
+    
+    <div id="status" class="status disconnected">Disconnected</div>
+    
+    <div>
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
+        <button onclick="sendPing()">Send Ping</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div>
+        <input type="text" id="messageInput" placeholder="Enter message to send" />
+        <button onclick="sendMessage()">Send Message</button>
+    </div>
+    
+    <div id="log" class="log"></div>
+
+    <script>
+        let ws = null;
+        const statusDiv = document.getElementById('status');
+        const logDiv = document.getElementById('log');
+        const messageInput = document.getElementById('messageInput');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatus(status, className) {
+            statusDiv.textContent = status;
+            statusDiv.className = `status ${className}`;
+        }
+
+        function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                log('❌ Already connected');
+                return;
+            }
+
+            try {
+                log('🔌 Attempting to connect to ws://localhost:8000/ws/comms');
+                updateStatus('Connecting...', 'connecting');
+                
+                ws = new WebSocket('ws://localhost:8000/ws/comms');
+
+                ws.onopen = function(event) {
+                    log('✅ WebSocket connected successfully!');
+                    updateStatus('Connected', 'connected');
+                    log(`🔌 Connection details: ${JSON.stringify({
+                        readyState: ws.readyState,
+                        protocol: ws.protocol,
+                        url: ws.url
+                    })}`);
+                };
+
+                ws.onmessage = function(event) {
+                    log(`📨 Received: ${event.data}`);
+                    try {
+                        const parsed = JSON.parse(event.data);
+                        log(`📋 Parsed message: ${JSON.stringify(parsed, null, 2)}`);
+                    } catch (e) {
+                        log(`❌ Failed to parse message as JSON: ${e.message}`);
+                    }
+                };
+
+                ws.onclose = function(event) {
+                    log(`❌ WebSocket closed: code=${event.code}, reason="${event.reason}", wasClean=${event.wasClean}`);
+                    updateStatus('Disconnected', 'disconnected');
+                };
+
+                ws.onerror = function(error) {
+                    log(`🚨 WebSocket error: ${JSON.stringify(error)}`);
+                    log(`🚨 Error details: type=${error.type}, target=${error.target}`);
+                    updateStatus('Error', 'disconnected');
+                };
+
+            } catch (error) {
+                log(`❌ Failed to create WebSocket: ${error.message}`);
+                updateStatus('Error', 'disconnected');
+            }
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+                log('🔌 Disconnected manually');
+                updateStatus('Disconnected', 'disconnected');
+            }
+        }
+
+        function sendPing() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                log('❌ WebSocket not connected');
+                return;
+            }
+
+            const message = {
+                event_type: 'ping',
+                payload: {
+                    timestamp: new Date().toISOString()
+                }
+            };
+
+            try {
+                ws.send(JSON.stringify(message));
+                log(`📤 Sent ping: ${JSON.stringify(message)}`);
+            } catch (error) {
+                log(`❌ Failed to send ping: ${error.message}`);
+            }
+        }
+
+        function sendMessage() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                log('❌ WebSocket not connected');
+                return;
+            }
+
+            const messageText = messageInput.value.trim();
+            if (!messageText) {
+                log('❌ Please enter a message');
+                return;
+            }
+
+            const message = {
+                event_type: 'llm_query',
+                payload: {
+                    message: messageText,
+                    timestamp: new Date().toISOString()
+                }
+            };
+
+            try {
+                ws.send(JSON.stringify(message));
+                log(`📤 Sent message: ${JSON.stringify(message)}`);
+                messageInput.value = '';
+            } catch (error) {
+                log(`❌ Failed to send message: ${error.message}`);
+            }
+        }
+
+        function clearLog() {
+            logDiv.innerHTML = '';
+        }
+
+        // Auto-connect on page load
+        window.onload = function() {
+            log('🚀 WebSocket Debug Test loaded');
+            connect();
+        };
+
+        // Handle Enter key in message input
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

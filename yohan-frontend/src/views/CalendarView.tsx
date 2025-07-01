@@ -92,12 +92,12 @@ export function CalendarView() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-center h-96">
+      <div className="bg-background p-4" style={{ height: 'calc(100vh - 80px)' }}>
+        <div className="max-w-6xl mx-auto h-full">
+          <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading calendar events...</p>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-3"></div>
+              <p className="text-muted-foreground text-sm">Loading calendar events...</p>
             </div>
           </div>
         </div>
@@ -106,12 +106,12 @@ export function CalendarView() {
   }
 
   return (
-    <div className="h-screen bg-background p-4 dashboard-optimized overflow-hidden">
+    <div className="bg-background p-3 dashboard-optimized overflow-hidden" style={{ height: 'calc(100vh - 80px)' }}>
       <div className="h-full max-w-6xl mx-auto">
         {/* Single Calendar Card - Full Height */}
         <Card className="h-full window-container">
-          <CardContent className="p-4 h-full flex flex-col">
-            <div className="calendar-container flex-1" style={{ height: 'calc(100vh - 140px)' }}>
+          <CardContent className="p-3 h-full flex flex-col">
+            <div className="calendar-container flex-1" style={{ height: 'calc(100vh - 160px)' }}>
               <Calendar
                 localizer={localizer}
                 events={calendarData}

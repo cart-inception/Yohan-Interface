@@ -6,12 +6,12 @@ export function WeatherView() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-center h-96">
+      <div className="bg-background p-4" style={{ height: 'calc(100vh - 80px)' }}>
+        <div className="max-w-6xl mx-auto h-full">
+          <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading weather data...</p>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-3"></div>
+              <p className="text-muted-foreground text-sm">Loading weather data...</p>
             </div>
           </div>
         </div>
@@ -21,18 +21,20 @@ export function WeatherView() {
 
   if (!weatherData) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-6xl mx-auto">
-          <Card className="max-w-md mx-auto mt-20">
-            <CardHeader>
-              <CardTitle>No Weather Data</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Unable to load weather information. Please check your connection and try again.
-              </p>
-            </CardContent>
-          </Card>
+      <div className="bg-background p-4" style={{ height: 'calc(100vh - 80px)' }}>
+        <div className="max-w-6xl mx-auto h-full">
+          <div className="flex items-center justify-center h-full">
+            <Card className="max-w-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">No Weather Data</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Unable to load weather information. Please check your connection and try again.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     );
@@ -93,29 +95,29 @@ export function WeatherView() {
   })();
 
   return (
-    <div className="h-screen bg-background p-4 dashboard-optimized overflow-hidden">
+    <div className="bg-background p-3 dashboard-optimized overflow-hidden" style={{ height: 'calc(100vh - 85px)' }}>
       <div className="h-full max-w-6xl mx-auto">
         {/* Two-row layout optimized for 1024x600 */}
-        <div className="h-full grid grid-rows-2 gap-4">
+        <div className="h-full grid grid-rows-2 gap-3 pb-2">
 
           {/* Top Row - Current Weather */}
           <Card className="window-container">
-            <CardContent className="p-4 h-full">
-              <div className="grid grid-cols-2 gap-6 h-full items-center">
+            <CardContent className="p-3 h-full">
+              <div className="grid grid-cols-2 gap-4 h-full items-center">
 
                 {/* Current Temperature and Conditions */}
                 <div className="text-center">
-                  <div className="mb-2">
-                    <div className="text-xl font-semibold text-primary mb-1">
+                  <div className="mb-1">
+                    <div className="text-lg font-semibold text-primary mb-1">
                       {weatherData.location || 'Des Moines, Iowa'}
                     </div>
                   </div>
-                  <div className="flex items-center justify-center gap-3 mb-3">
-                    <div className="text-5xl font-light text-foreground">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <div className="text-4xl font-light text-foreground">
                       {formatTemp(current.temp)}
                     </div>
                     <div className="text-left">
-                      <p className="text-lg text-muted-foreground capitalize">
+                      <p className="text-base text-muted-foreground capitalize">
                         {current.description}
                       </p>
                       <p className="text-sm text-muted-foreground">
@@ -160,24 +162,24 @@ export function WeatherView() {
           </Card>
 
           {/* Bottom Row - Split between Hourly and Daily Forecasts */}
-          <div className="grid grid-cols-2 gap-4 h-full">
+          <div className="grid grid-cols-2 gap-4 h-full weather-forecast-container">
 
-            {/* Hourly Forecast */}
+            {/* Hourly Forecast - Compact for 7-inch screen */}
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold text-foreground">12-Hour Forecast</CardTitle>
+              <CardHeader className="pb-1">
+                <CardTitle className="text-base font-semibold text-foreground">12-Hour Forecast</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                  {next12Hours.map((hour, index) => (
+                <div className="grid grid-cols-2 gap-1 h-full overflow-hidden">
+                  {next12Hours.slice(0, 6).map((hour, index) => (
                     <div
                       key={index}
-                      className="bg-secondary/30 rounded-lg p-2 text-center hover:bg-secondary/50 transition-colors"
+                      className="bg-secondary/30 rounded-lg p-1.5 text-center hover:bg-secondary/50 transition-colors"
                     >
-                      <div className="text-xs text-muted-foreground mb-1">
+                      <div className="text-xs text-muted-foreground mb-0.5">
                         {formatTime(hour.time)}
                       </div>
-                      <div className="text-lg font-semibold text-foreground mb-1">
+                      <div className="text-sm font-semibold text-foreground mb-0.5">
                         {formatTemp(hour.temp)}
                       </div>
                       <div className="text-xs text-muted-foreground capitalize truncate">
@@ -189,20 +191,20 @@ export function WeatherView() {
               </CardContent>
             </Card>
 
-            {/* 7-Day Forecast */}
+            {/* 7-Day Forecast - Compact for 7-inch screen */}
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold text-foreground">7-Day Forecast</CardTitle>
+              <CardHeader className="pb-1">
+                <CardTitle className="text-base font-semibold text-foreground">7-Day Forecast</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {next7Days.map((day, index) => (
+                <div className="space-y-1 h-full overflow-hidden">
+                  {next7Days.slice(0, 5).map((day, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg hover:bg-secondary/50 transition-colors"
+                      className="flex items-center justify-between p-1.5 bg-secondary/30 rounded-lg hover:bg-secondary/50 transition-colors"
                     >
                       <div className="flex items-center gap-2 flex-1">
-                        <div className="text-sm font-medium text-foreground min-w-[60px]">
+                        <div className="text-xs font-medium text-foreground min-w-[50px]">
                           {(() => {
                             const dayDate = new Date(day.date);
                             const today = new Date();
@@ -218,7 +220,7 @@ export function WeatherView() {
                       </div>
 
                       <div className="text-right">
-                        <span className="text-sm font-semibold text-foreground">
+                        <span className="text-xs font-semibold text-foreground">
                           {formatTemp(day.max_temp)}
                         </span>
                         <span className="text-muted-foreground text-xs mx-1">/</span>

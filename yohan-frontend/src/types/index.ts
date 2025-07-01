@@ -3,3 +3,4 @@
 export * from './weather';
 export * from './calendar';
 export * from './websocket';
+export * from './chat';

@@ -1,14 +1,14 @@
 // Custom hook for managing WebSocket connection to the Yohan backend
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { useAppStore } from '../store/appStore';
-import type { 
-  WebSocketMessage, 
-  VoiceStatusMessage, 
-  LLMResponseMessage, 
-  ChatMessage 
+import type {
+  WebSocketMessage,
+  VoiceStatusMessage,
+  LLMResponseMessage
 } from '../types';
+import type { ChatMessageType } from '../types/chat';
 
 // WebSocket configuration
 const WEBSOCKET_URL = 'ws://localhost:8000/ws/comms';
@@ -16,9 +16,11 @@ const WEBSOCKET_URL = 'ws://localhost:8000/ws/comms';
 // Connection options
 const WEBSOCKET_OPTIONS = {
   shouldReconnect: () => true, // Automatically reconnect on disconnect
-  reconnectAttempts: 5, // Reduce attempts to prevent hanging
-  reconnectInterval: 5000, // 5 seconds between reconnection attempts
-  // Remove heartbeat for now to simplify debugging
+  reconnectAttempts: 10, // Increase attempts
+  reconnectInterval: 3000, // 3 seconds between reconnection attempts
+  // Add more debugging and error handling
+  retryOnError: true,
+  skipAssert: true, // Skip assertions that might cause issues with React 19
 };
 
 /**
@@ -28,6 +30,11 @@ const WEBSOCKET_OPTIONS = {
 export function useAppWebSocket() {
   console.log('🔌 Initializing WebSocket hook, connecting to:', WEBSOCKET_URL);
   console.log('🔌 react-use-websocket version check:', typeof useWebSocket);
+
+  // Add connection state tracking
+  const [connectionAttempts, setConnectionAttempts] = useState(0);
+  const [lastError, setLastError] = useState<string | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get store actions
   const {
@@ -51,7 +58,7 @@ export function useAppWebSocket() {
         
         case 'llm_response': {
           const llmMessage = message as LLMResponseMessage;
-          const chatMessage: ChatMessage = {
+          const chatMessage: ChatMessageType = {
             id: `assistant-${Date.now()}`,
             content: llmMessage.payload.message,
             timestamp: llmMessage.payload.timestamp,
@@ -87,23 +94,59 @@ export function useAppWebSocket() {
   // Initialize WebSocket connection
   const {
     sendJsonMessage,
+    lastMessage,
     readyState,
     getWebSocket,
   } = useWebSocket(WEBSOCKET_URL, {
     ...WEBSOCKET_OPTIONS,
     onMessage: handleMessage,
-    onOpen: () => {
+    onOpen: (event) => {
       console.log('✅ WebSocket connected successfully to:', WEBSOCKET_URL);
+      console.log('🔌 Connection event:', event);
+      setConnectionAttempts(0);
+      setLastError(null);
       setError(null); // Clear any previous connection errors
+
+      // Clear any pending reconnect timeout
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
     },
     onClose: (event) => {
       console.log('❌ WebSocket disconnected:', event.code, event.reason);
+      console.log('🔌 Close event details:', {
+        code: event.code,
+        reason: event.reason,
+        wasClean: event.wasClean,
+        type: event.type
+      });
+
+      setConnectionAttempts(prev => prev + 1);
+
+      // Set error message based on close reason
+      if (event.code === 1006) {
+        setLastError('Connection lost unexpectedly');
+      } else if (event.code === 1000) {
+        setLastError('Connection closed normally');
+      } else {
+        setLastError(`Connection closed with code ${event.code}: ${event.reason}`);
+      }
     },
     onError: (event) => {
       console.error('🚨 WebSocket error:', event);
+      console.error('🔌 Error event details:', {
+        type: event.type,
+        target: event.target,
+        timeStamp: event.timeStamp
+      });
+
+      setConnectionAttempts(prev => prev + 1);
+      setLastError(`WebSocket error occurred (attempt ${connectionAttempts + 1})`);
+
       // Don't set error immediately to prevent blocking the UI
       setTimeout(() => {
-        setError('WebSocket connection failed - retrying...');
+        setError(`WebSocket connection failed - retrying... (attempt ${connectionAttempts + 1})`);
       }, 1000);
     },
   });
@@ -122,7 +165,7 @@ export function useAppWebSocket() {
       sendJsonMessage(message);
       
       // Add user message to chat history
-      const userMessage: ChatMessage = {
+      const userMessage: ChatMessageType = {
         id: `user-${Date.now()}`,
         content,
         timestamp: new Date().toISOString(),
@@ -134,6 +177,22 @@ export function useAppWebSocket() {
       setError('Cannot send message: WebSocket not connected');
     }
   }, [readyState, sendJsonMessage, addChatMessage, setError]);
+
+  // Add effect to monitor connection state changes
+  useEffect(() => {
+    console.log('🔌 WebSocket state changed:', {
+      readyState,
+      connectionAttempts,
+      lastError,
+      status: {
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'Connected',
+        [ReadyState.CLOSING]: 'Closing',
+        [ReadyState.CLOSED]: 'Closed',
+        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+      }[readyState]
+    });
+  }, [readyState, connectionAttempts, lastError]);
 
   // Connection status helper
   const connectionStatus = {
@@ -150,11 +209,13 @@ export function useAppWebSocket() {
     isConnected: readyState === ReadyState.OPEN,
     connectionStatus,
     readyState,
-    
+    connectionAttempts,
+    lastError,
+
     // Actions
     sendChatMessage,
     sendJsonMessage,
-    
+
     // WebSocket instance (for advanced usage)
     getWebSocket,
   };

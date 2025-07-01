@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { WeatherData, CalendarEvent, ChatMessage } from '../types';
+import type { WeatherData, CalendarEvent } from '../types';
+import type { ChatMessageType } from '../types/chat';
 
 // Voice status type
 export type VoiceStatus = 'idle' | 'listening' | 'processing' | 'speaking';
@@ -9,7 +10,7 @@ interface AppState {
   // Data state
   weatherData: WeatherData | null;
   calendarEvents: CalendarEvent[];
-  chatHistory: ChatMessage[];
+  chatHistory: ChatMessageType[];
   voiceStatus: VoiceStatus;
   
   // UI state
@@ -27,8 +28,8 @@ interface AppState {
   clearCalendarEvents: () => void;
 
   // Actions for managing chat history
-  addChatMessage: (message: ChatMessage) => void;
-  setChatHistory: (messages: ChatMessage[]) => void;
+  addChatMessage: (message: ChatMessageType) => void;
+  setChatHistory: (messages: ChatMessageType[]) => void;
   clearChatHistory: () => void;
 
   // Actions for voice status

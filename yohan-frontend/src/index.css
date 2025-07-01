@@ -144,6 +144,66 @@
     .weather-detail-card .text-xl {
       font-size: 1rem !important;
     }
+
+    /* Chat view optimizations for 7-inch screen */
+    .chat-message {
+      margin-bottom: 8px !important;
+    }
+
+    .chat-message .max-w-\[80\%\] {
+      max-width: 85% !important;
+    }
+
+    /* Compact input area */
+    .chat-input-card {
+      padding: 12px !important;
+    }
+
+    /* Ensure proper height calculation for chat view */
+    .chat-container {
+      height: calc(100vh - 80px) !important;
+    }
+
+    /* Optimize message bubbles for touch */
+    .chat-message-bubble {
+      padding: 8px 12px !important;
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+    }
+
+    /* Weather view optimizations */
+    .weather-current-temp {
+      font-size: 3rem !important;
+    }
+
+    .weather-location {
+      font-size: 1.125rem !important;
+    }
+
+    /* Ensure weather cards don't get cut off */
+    .weather-forecast-container {
+      padding-bottom: 8px !important;
+    }
+
+    /* Calendar view optimizations */
+    .calendar-container {
+      height: calc(100vh - 160px) !important;
+    }
+
+    .calendar-container .rbc-toolbar {
+      margin-bottom: 8px !important;
+    }
+
+    .calendar-container .rbc-toolbar button {
+      padding: 4px 8px !important;
+      font-size: 12px !important;
+    }
+
+    /* Ensure all dedicated views fit properly */
+    .view-container {
+      height: calc(100vh - 80px) !important;
+      overflow: hidden !important;
+    }
   }
 
   /* Premium gradient border card styling matching mockup */

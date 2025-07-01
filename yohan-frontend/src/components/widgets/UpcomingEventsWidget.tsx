@@ -55,8 +55,11 @@ export function UpcomingEventsWidget() {
       <CardContent className="space-y-3">
         {upcomingEvents.slice(0, 3).map((event, index) => (
           <div key={index} className="flex items-center space-x-3 py-2">
-            <div className="text-sm text-muted-foreground min-w-[80px]">
-              {new Date(event.start_time).toLocaleTimeString([], {
+            <div className="text-sm text-muted-foreground min-w-[120px]">
+              {new Date(event.start_time).toLocaleDateString([], {
+                month: 'short',
+                day: 'numeric'
+              })} {new Date(event.start_time).toLocaleTimeString([], {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: true

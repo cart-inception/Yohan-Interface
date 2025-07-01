@@ -121,48 +121,30 @@ This document provides a highly detailed, phased development plan. Each task is 
     - [x] 3.3.3.6: Implement a message queue if needed to handle multiple concurrent requests.
 
   - **3.3.4: Create Chat Interface Components**
-    - [ ] 3.3.4.1: Install additional shadcn/ui components: npx shadcn-ui@latest add input scroll-area.
-    - [ ] 3.3.4.2: Create src/types/chat.ts to define TypeScript interfaces for chat messages and WebSocket payloads.
-    - [ ] 3.3.4.3: Update the Zustand store in src/store/appStore.ts to include chat history state and actions.
-    - [ ] 3.3.4.4: Create src/components/ChatMessage.tsx to render individual messages with appropriate styling.
-    - [ ] 3.3.4.5: Implement different visual styles for user messages vs. assistant responses.
-    - [ ] 3.3.4.6: Add timestamp display and any other metadata visualization needed.
+    - [x] 3.3.4.1: Install additional shadcn/ui components: npx shadcn-ui@latest add input scroll-area.
+    - [x] 3.3.4.2: Create src/types/chat.ts to define TypeScript interfaces for chat messages and WebSocket payloads.
+    - [x] 3.3.4.3: Update the Zustand store in src/store/appStore.ts to include chat history state and actions.
+    - [x] 3.3.4.4: Create src/components/ChatMessage.tsx to render individual messages with appropriate styling.
+    - [x] 3.3.4.5: Implement different visual styles for user messages vs. assistant responses.
+    - [x] 3.3.4.6: Add timestamp display and any other metadata visualization needed.
 
   - **3.3.5: Build Chat View**
-    - [ ] 3.3.5.1: Create src/views/ChatView.tsx as a new full-screen view.
-    - [ ] 3.3.5.2: Implement a message container with scrolling capability using shadcn's ScrollArea.
-    - [ ] 3.3.5.3: Add auto-scrolling behavior to keep the most recent messages visible.
-    - [ ] 3.3.5.4: Create an input form with text field and send button using shadcn components.
-    - [ ] 3.3.5.5: Implement form submission logic to send messages via WebSocket.
-    - [ ] 3.3.5.6: Add visual feedback for connection status and message sending state.
-    - [ ] 3.3.5.7: Implement loading indicators for when the LLM is generating a response.
+    - [x] 3.3.5.1: Create src/views/ChatView.tsx as a new full-screen view.
+    - [x] 3.3.5.2: Implement a message container with scrolling capability using shadcn's ScrollArea.
+    - [x] 3.3.5.3: Add auto-scrolling behavior to keep the most recent messages visible.
+    - [x] 3.3.5.4: Create an input form with text field and send button using shadcn components.
+    - [x] 3.3.5.5: Implement form submission logic to send messages via WebSocket.
+    - [x] 3.3.5.6: Add visual feedback for connection status and message sending state.
+    - [x] 3.3.5.7: Implement loading indicators for when the LLM is generating a response.
 
-  - **3.3.6: WebSocket Integration**
-    - [ ] 3.3.6.1: Update src/hooks/useAppWebSocket.ts to handle LLM-related message types.
-    - [ ] 3.3.6.2: Create a sendChatMessage function that formats and sends LLM queries.
-    - [ ] 3.3.6.3: Implement handlers for llm_response messages to update the chat history in the store.
-    - [ ] 3.3.6.4: Add reconnection logic to handle WebSocket disconnections gracefully.
-    - [ ] 3.3.6.5: Implement message queuing for offline scenarios or connection issues.
-
-  - **3.3.7: App Navigation Updates**
-    - [ ] 3.3.7.1: Update App.tsx to include the new ChatView in the view switching logic.
-    - [ ] 3.3.7.2: Add a navigation button or icon for the chat interface.
-    - [ ] 3.3.7.3: Consider adding a chat notification indicator for new messages.
-    - [ ] 3.3.7.4: Implement keyboard shortcuts for quick access to the chat view.
-
-  - **3.3.8: Testing**
-    - [ ] 3.3.8.1: Create unit tests for the LLM service using pytest.
-    - [ ] 3.3.8.2: Test the WebSocket communication with mock clients.
-    - [ ] 3.3.8.3: Verify that context from weather and calendar is correctly included in prompts.
-    - [ ] 3.3.8.4: Test error handling and edge cases (API failures, malformed messages).
-    - [ ] 3.3.8.5: Perform end-to-end testing of the complete chat flow.
-
-  - **3.3.9: Refinement**
-    - [ ] 3.3.9.1: Optimize the system prompt based on testing results.
-    - [ ] 3.3.9.2: Fine-tune the UI for better usability and aesthetics.
-    - [ ] 3.3.9.3: Implement message persistence to maintain chat history across sessions.
-    - [ ] 3.3.9.4: Add the ability to clear chat history.
-    - [ ] 3.3.9.5: Consider implementing typing indicators or other dynamic feedback.
+    From this point on we have switched to an http api call to the backend instead of a WebSocket connection.
+    
+  - **3.3.6: Refinement**
+    - [ ] 3.3.6.1: Optimize the system prompt based on testing results.
+    - [ ] 3.3.6.2: Fine-tune the UI for better usability and aesthetics.
+    - [ ] 3.3.6.3: Implement message persistence to maintain chat history across sessions.
+    - [ ] 3.3.6.4: Add the ability to clear chat history.
+    - [ ] 3.3.6.5: Consider implementing typing indicators or other dynamic feedback.
 
 ---
 

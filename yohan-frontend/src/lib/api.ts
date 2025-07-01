@@ -1,6 +1,7 @@
 // API client functions for communicating with the Yohan backend
 
 import type { WeatherData, CalendarEvent } from '../types';
+import type { ChatMessageType } from '../types/chat';
 
 // Configuration
 const API_BASE_URL = 'http://localhost:8000'; // Backend server URL
@@ -23,16 +24,23 @@ export class ApiError extends Error {
 }
 
 // Generic fetch wrapper with error handling
-async function apiRequest<T>(endpoint: string): Promise<T> {
+async function apiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
+  const defaultOptions: RequestInit = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const finalOptions = { ...defaultOptions, ...options };
+
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(url, finalOptions);
 
     if (!response.ok) {
       throw new ApiError(
@@ -48,7 +56,7 @@ async function apiRequest<T>(endpoint: string): Promise<T> {
     if (error instanceof ApiError) {
       throw error;
     }
-    
+
     // Handle network errors or other fetch failures
     throw new ApiError(
       `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -91,11 +99,66 @@ export async function fetchCalendar(): Promise<CalendarEvent[]> {
 
 /**
  * Health check endpoint to verify backend connectivity
- * 
+ *
  * @returns Promise<{status: string}> - Health status response
  */
 export async function healthCheck(): Promise<{ status: string }> {
   return apiRequest<{ status: string }>('/health');
+}
+
+// Chat API types
+interface ChatRequest {
+  message: string;
+  conversation_id?: string;
+  conversation_history?: Array<{
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp?: string;
+  }>;
+}
+
+interface ChatResponse {
+  message: string;
+  timestamp: string;
+  conversation_id?: string;
+  usage?: {
+    input_tokens: number;
+    output_tokens: number;
+    total_tokens: number;
+  };
+  model?: string;
+}
+
+/**
+ * Send a message to the LLM and get a response
+ *
+ * @param message - The user's message
+ * @param conversationHistory - Optional conversation history for context
+ * @param conversationId - Optional conversation ID for tracking
+ * @returns Promise<ChatResponse> - LLM response with metadata
+ */
+export async function sendChatMessage(
+  message: string,
+  conversationHistory?: ChatMessageType[],
+  conversationId?: string
+): Promise<ChatResponse> {
+  // Convert ChatMessageType[] to the format expected by the API
+  const apiConversationHistory = conversationHistory?.map(msg => ({
+    role: msg.sender === 'user' ? 'user' as const : 'assistant' as const,
+    content: msg.content,
+    timestamp: msg.timestamp
+  }));
+
+  const requestBody: ChatRequest = {
+    message,
+    conversation_id: conversationId,
+    conversation_history: apiConversationHistory
+  };
+
+  return apiRequest<ChatResponse>('/api/chat', {
+    method: 'POST',
+    body: JSON.stringify(requestBody)
+  });
 }
 
 

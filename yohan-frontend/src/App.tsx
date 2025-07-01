@@ -3,10 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { useAppStore } from './store/appStore';
 import { useAppWebSocket } from './hooks/useAppWebSocket';
+import { useNativeWebSocket } from './hooks/useNativeWebSocket';
+import { useHttpChat } from './hooks/useHttpChat';
 import { fetchWeather, fetchCalendar, healthCheck, ApiError } from './lib/api';
 import { DashboardView } from './views/DashboardView';
 import { WeatherView } from './views/WeatherView';
 import { CalendarView } from './views/CalendarView';
+import { ChatView } from './views/ChatView';
 
 function App() {
   const [isInitializing, setIsInitializing] = useState(true);
@@ -22,10 +25,33 @@ function App() {
     setLoading,
     setError,
     setCurrentView,
+    clearChatHistory,
   } = useAppStore();
 
-  // Initialize WebSocket connection
-  useAppWebSocket();
+  // Use HTTP-based chat instead of WebSocket for better reliability
+  const { isConnected, connectionStatus, sendChatMessage, isLoading } = useHttpChat();
+
+  // WebSocket alternatives (commented out)
+  // const { isConnected, connectionStatus, sendChatMessage, connectionAttempts, lastError } = useNativeWebSocket();
+  // useAppWebSocket();
+
+  // Debug: Log chat status changes
+  useEffect(() => {
+    console.log('💬 App: Chat status changed:', {
+      isConnected,
+      connectionStatus,
+      isLoading
+    });
+  }, [isConnected, connectionStatus, isLoading]);
+
+  // Function to handle view changes and clear chat when leaving chat view
+  const handleViewChange = (newView: 'dashboard' | 'weather' | 'calendar' | 'chat') => {
+    // If we're currently on chat and navigating away, clear the chat history
+    if (currentView === 'chat' && newView !== 'chat') {
+      clearChatHistory();
+    }
+    setCurrentView(newView);
+  };
 
   // Function to load initial data
   const loadInitialData = async () => {
@@ -133,7 +159,7 @@ function App() {
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
-                onClick={() => setCurrentView('dashboard')}
+                onClick={() => handleViewChange('dashboard')}
                 className="flex items-center gap-2 hover:bg-primary/20 hover:text-primary transition-all duration-200"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +182,7 @@ function App() {
                 <Button
                   variant={currentView === 'weather' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setCurrentView('weather')}
+                  onClick={() => handleViewChange('weather')}
                   className="transition-all duration-200"
                 >
                   Weather
@@ -164,7 +190,7 @@ function App() {
                 <Button
                   variant={currentView === 'calendar' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setCurrentView('calendar')}
+                  onClick={() => handleViewChange('calendar')}
                   className="transition-all duration-200"
                 >
                   Calendar
@@ -172,11 +198,24 @@ function App() {
                 <Button
                   variant={currentView === 'chat' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setCurrentView('chat')}
+                  onClick={() => handleViewChange('chat')}
                   className="transition-all duration-200"
                 >
                   Chat
                 </Button>
+              </div>
+
+              {/* Chat Status Indicator */}
+              <div className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+                isConnected ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${
+                    isLoading ? 'bg-yellow-400 animate-pulse' :
+                    isConnected ? 'bg-green-400' : 'bg-red-400 animate-pulse'
+                  }`}></div>
+                  {isLoading ? 'Processing...' : connectionStatus}
+                </div>
               </div>
 
               {/* Voice Status Indicator */}
@@ -223,44 +262,11 @@ function App() {
         )}
         {currentView === 'chat' && (
           <div className="animate-in fade-in-0 slide-in-from-right-4 duration-300">
-            <div className="min-h-screen bg-background p-6 dashboard-optimized">
-              <div className="max-w-6xl mx-auto space-y-6">
-                <Card className="window-container">
-                  <CardHeader>
-                    <CardTitle className="section-header">AI Assistant</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-20">
-                      <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg
-                          className="w-12 h-12 text-primary"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                          />
-                        </svg>
-                      </div>
-                      <h2 className="text-2xl font-semibold mb-4 text-foreground">Chat Interface</h2>
-                      <p className="text-muted-foreground mb-6">
-                        The AI chat interface will be implemented in Phase 3.3
-                      </p>
-                      <div className="bg-secondary/30 rounded-lg p-6 max-w-md mx-auto">
-                        <p className="text-sm text-muted-foreground">
-                          This will include voice interaction, text chat, and intelligent responses
-                          to help you manage your calendar and get weather information.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+            <ChatView
+              sendChatMessage={sendChatMessage}
+              isConnected={isConnected}
+              connectionStatus={connectionStatus}
+            />
           </div>
         )}
       </div>
