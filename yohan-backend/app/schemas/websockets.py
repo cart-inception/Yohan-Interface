@@ -13,6 +13,7 @@ class LLMQueryPayload(BaseModel):
     message: str
     timestamp: str
     conversation_id: Optional[str] = None
+    message_id: Optional[str] = None
 
 class LLMResponsePayload(BaseModel):
     """Payload for LLM response messages to frontend"""
@@ -21,6 +22,8 @@ class LLMResponsePayload(BaseModel):
     conversation_id: Optional[str] = None
     usage: Optional[Dict[str, Any]] = None
     model: Optional[str] = None
+    message_id: Optional[str] = None
+    in_reply_to: Optional[str] = None
 
 class VoiceStatusPayload(BaseModel):
     """Payload for voice status updates"""
@@ -32,6 +35,13 @@ class ErrorPayload(BaseModel):
     error: str
     error_type: Optional[str] = None
     timestamp: Optional[str] = None
+
+class MessageAckPayload(BaseModel):
+    """Payload for message acknowledgments"""
+    message_id: str
+    status: str  # 'received', 'processing', 'delivered', 'error'
+    timestamp: str
+    error_message: Optional[str] = None
 
 # Typed WebSocket message classes
 
@@ -54,3 +64,8 @@ class ErrorMessage(WebSocketMessage):
     """WebSocket message for errors"""
     event_type: str = "error"
     payload: ErrorPayload
+
+class MessageAckMessage(WebSocketMessage):
+    """WebSocket message for message acknowledgments"""
+    event_type: str = "message_ack"
+    payload: MessageAckPayload

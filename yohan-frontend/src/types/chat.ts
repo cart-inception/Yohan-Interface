@@ -15,24 +15,4 @@ export interface ChatState {
   error: string | null;
 }
 
-// WebSocket payload types for chat
-export interface LLMQueryPayload {
-  message: string;
-  timestamp: string;
-}
-
-export interface LLMResponsePayload {
-  message: string;
-  timestamp: string;
-}
-
-// Chat-specific WebSocket message types
-export interface LLMQueryMessage {
-  event_type: 'llm_query';
-  payload: LLMQueryPayload;
-}
-
-export interface LLMResponseMessage {
-  event_type: 'llm_response';
-  payload: LLMResponsePayload;
-}
+// Note: WebSocket message types are now defined in websocket.ts to avoid duplication

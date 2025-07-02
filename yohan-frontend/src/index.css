@@ -182,7 +182,7 @@
 
     /* Ensure weather cards don't get cut off */
     .weather-forecast-container {
-      padding-bottom: 8px !important;
+      height: 100%;
     }
 
     /* Calendar view optimizations */

@@ -5,7 +5,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChatMessage } from '../components/ChatMessage';
 import { useAppStore } from '../store/appStore';
-import { cn } from '@/lib/utils';
 
 interface ChatViewProps {
   sendChatMessage: (message: string) => void;
@@ -13,7 +12,7 @@ interface ChatViewProps {
   connectionStatus: string;
 }
 
-export function ChatView({ sendChatMessage, isConnected, connectionStatus }: ChatViewProps) {
+export function ChatView({ sendChatMessage, isConnected }: ChatViewProps) {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -22,10 +21,8 @@ export function ChatView({ sendChatMessage, isConnected, connectionStatus }: Cha
   // Get store state and actions
   const {
     chatHistory,
-    voiceStatus,
     error,
     setError,
-    clearChatHistory,
   } = useAppStore();
 
   // WebSocket functions are now passed as props
@@ -47,13 +44,7 @@ export function ChatView({ sendChatMessage, isConnected, connectionStatus }: Cha
     }
   }, []);
 
-  // Cleanup: Clear chat history when component unmounts
-  useEffect(() => {
-    return () => {
-      // This cleanup function runs when the component unmounts
-      clearChatHistory();
-    };
-  }, [clearChatHistory]);
+  // Note: Chat history now persists across navigation thanks to WebSocket session management
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {

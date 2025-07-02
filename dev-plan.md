@@ -138,10 +138,10 @@ This document provides a highly detailed, phased development plan. Each task is 
     - [x] 3.3.5.7: Implement loading indicators for when the LLM is generating a response.
 
     From this point on we have switched to an http api call to the backend instead of a WebSocket connection.
-    
+
   - **3.3.6: Refinement**
-    - [ ] 3.3.6.1: Optimize the system prompt based on testing results.
-    - [ ] 3.3.6.2: Fine-tune the UI for better usability and aesthetics.
+    - [x] 3.3.6.1: Optimize the system prompt based on testing results.
+    - [] 3.3.6.2: Fine-tune the UI for better usability and aesthetics.
     - [ ] 3.3.6.3: Implement message persistence to maintain chat history across sessions.
     - [ ] 3.3.6.4: Add the ability to clear chat history.
     - [ ] 3.3.6.5: Consider implementing typing indicators or other dynamic feedback.

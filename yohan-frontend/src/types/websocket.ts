@@ -18,10 +18,25 @@ export interface LLMResponseMessage extends WebSocketMessage {
   payload: {
     message: string;
     timestamp: string;
+    conversation_id?: string;
+    usage?: Record<string, any>;
+    model?: string;
+    message_id?: string;
+    in_reply_to?: string;
+  };
+}
+
+export interface MessageAckMessage extends WebSocketMessage {
+  event_type: 'message_ack';
+  payload: {
+    message_id: string;
+    status: 'received' | 'processing' | 'delivered' | 'error';
+    timestamp: string;
+    error_message?: string;
   };
 }
 
 
 
 // Union type for all possible WebSocket messages
-export type AppWebSocketMessage = VoiceStatusMessage | LLMResponseMessage | WebSocketMessage;
+export type AppWebSocketMessage = VoiceStatusMessage | LLMResponseMessage | MessageAckMessage | WebSocketMessage;

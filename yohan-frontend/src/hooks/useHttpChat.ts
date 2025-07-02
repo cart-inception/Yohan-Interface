@@ -59,11 +59,7 @@ export function useHttpChat() {
 
       console.log('💬 Received response from API:', response);
 
-      // Update user message status to sent
-      const updatedUserMessage: ChatMessageType = {
-        ...userMessage,
-        status: 'sent',
-      };
+      // User message status is implicitly 'sent' when we get a response
       
       // Create assistant message from response
       const assistantMessage: ChatMessageType = {
@@ -84,11 +80,7 @@ export function useHttpChat() {
     } catch (error) {
       console.error('💬 Error sending chat message:', error);
       
-      // Update user message status to error
-      const errorUserMessage: ChatMessageType = {
-        ...userMessage,
-        status: 'error',
-      };
+      // Error handling - user message status remains as 'sending' to indicate failure
 
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setLastError(errorMessage);

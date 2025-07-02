@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { useAppStore } from './store/appStore';
 import { useAppWebSocket } from './hooks/useAppWebSocket';
-import { useNativeWebSocket } from './hooks/useNativeWebSocket';
 import { useHttpChat } from './hooks/useHttpChat';
 import { fetchWeather, fetchCalendar, healthCheck, ApiError } from './lib/api';
 import { DashboardView } from './views/DashboardView';
@@ -25,31 +24,41 @@ function App() {
     setLoading,
     setError,
     setCurrentView,
-    clearChatHistory,
   } = useAppStore();
 
-  // Use HTTP-based chat instead of WebSocket for better reliability
-  const { isConnected, connectionStatus, sendChatMessage, isLoading } = useHttpChat();
-
-  // WebSocket alternatives (commented out)
-  // const { isConnected, connectionStatus, sendChatMessage, connectionAttempts, lastError } = useNativeWebSocket();
-  // useAppWebSocket();
+  // Use WebSocket-based chat with HTTP fallback
+  const webSocketHook = useAppWebSocket();
+  const httpHook = useHttpChat();
+  
+  // Use WebSocket if connected, otherwise fall back to HTTP
+  const isConnected = webSocketHook.isConnected || httpHook.isConnected;
+  const connectionStatus = webSocketHook.isConnected ? 
+    `WebSocket ${webSocketHook.connectionStatus}${webSocketHook.sessionId ? ` (${webSocketHook.sessionId.slice(0, 8)})` : ''}` : 
+    `HTTP ${httpHook.connectionStatus}`;
+  const sendChatMessage = webSocketHook.isConnected ? webSocketHook.sendChatMessage : httpHook.sendChatMessage;
+  const isLoading = webSocketHook.isConnected ? (webSocketHook.pendingMessageCount > 0) : httpHook.isLoading;
 
   // Debug: Log chat status changes
   useEffect(() => {
     console.log('💬 App: Chat status changed:', {
-      isConnected,
-      connectionStatus,
-      isLoading
+      websocket: {
+        connected: webSocketHook.isConnected,
+        status: webSocketHook.connectionStatus,
+        sessionId: webSocketHook.sessionId,
+        pending: webSocketHook.pendingMessageCount
+      },
+      http: {
+        connected: httpHook.isConnected,
+        status: httpHook.connectionStatus,
+        loading: httpHook.isLoading
+      },
+      active: webSocketHook.isConnected ? 'WebSocket' : 'HTTP'
     });
-  }, [isConnected, connectionStatus, isLoading]);
+  }, [webSocketHook.isConnected, webSocketHook.connectionStatus, webSocketHook.sessionId, 
+      webSocketHook.pendingMessageCount, httpHook.isConnected, httpHook.connectionStatus, httpHook.isLoading]);
 
-  // Function to handle view changes and clear chat when leaving chat view
+  // Function to handle view changes (chat history now persists across navigation)
   const handleViewChange = (newView: 'dashboard' | 'weather' | 'calendar' | 'chat') => {
-    // If we're currently on chat and navigating away, clear the chat history
-    if (currentView === 'chat' && newView !== 'chat') {
-      clearChatHistory();
-    }
     setCurrentView(newView);
   };
 
@@ -205,16 +214,36 @@ function App() {
                 </Button>
               </div>
 
-              {/* Chat Status Indicator */}
+              {/* Enhanced Chat Status Indicator */}
               <div className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
-                isConnected ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                webSocketHook.isConnected ? 'bg-blue-500/20 text-blue-400' :
+                httpHook.isConnected ? 'bg-green-500/20 text-green-400' : 
+                'bg-red-500/20 text-red-400'
               }`}>
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${
                     isLoading ? 'bg-yellow-400 animate-pulse' :
-                    isConnected ? 'bg-green-400' : 'bg-red-400 animate-pulse'
+                    webSocketHook.isConnected ? 'bg-blue-400' :
+                    httpHook.isConnected ? 'bg-green-400' : 
+                    'bg-red-400 animate-pulse'
                   }`}></div>
-                  {isLoading ? 'Processing...' : connectionStatus}
+                  <div className="flex flex-col">
+                    <span>
+                      {isLoading ? 'Processing...' : 
+                       webSocketHook.isConnected ? 'WebSocket' : 
+                       httpHook.isConnected ? 'HTTP' : 'Disconnected'}
+                    </span>
+                    {webSocketHook.sessionId && (
+                      <span className="text-[10px] opacity-70">
+                        {webSocketHook.sessionId.slice(0, 8)}
+                      </span>
+                    )}
+                  </div>
+                  {webSocketHook.pendingMessageCount > 0 && (
+                    <div className="bg-yellow-400 text-black rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">
+                      {webSocketHook.pendingMessageCount}
+                    </div>
+                  )}
                 </div>
               </div>
 

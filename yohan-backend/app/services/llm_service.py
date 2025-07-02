@@ -98,19 +98,28 @@ Current context will be provided with each request, including weather data and u
             LLMResponse object with the generated response
         """
         try:
-            # Build the enriched prompt
-            enriched_prompt = self._build_enriched_prompt(message, context)
+            # Separate system messages from user/assistant conversation
+            system_messages = []
+            user_assistant_messages = []
             
-            # Prepare conversation messages
-            messages = []
-            
-            # Add conversation history if provided
             if conversation_history:
                 for hist_msg in conversation_history[-10:]:  # Keep last 10 messages
-                    messages.append({
-                        "role": hist_msg.role,
-                        "content": hist_msg.content
-                    })
+                    if hist_msg.role == "system":
+                        system_messages.append(hist_msg)
+                    elif hist_msg.role in ["user", "assistant"]:
+                        user_assistant_messages.append({
+                            "role": hist_msg.role,
+                            "content": hist_msg.content
+                        })
+            
+            # Build dynamic system prompt with context
+            dynamic_system_prompt = self._build_dynamic_system_prompt(system_messages, context)
+            
+            # Build the enriched user message
+            enriched_prompt = self._build_enriched_prompt(message, context)
+            
+            # Prepare conversation messages (only user/assistant)
+            messages = user_assistant_messages.copy()
             
             # Add current message
             messages.append({
@@ -118,13 +127,13 @@ Current context will be provided with each request, including weather data and u
                 "content": enriched_prompt
             })
             
-            logger.info(f"Sending request to Claude API with {len(messages)} messages")
+            logger.info(f"Sending request to Claude API with {len(messages)} messages and dynamic system prompt")
 
             # Check rate limiting before making request
             await self._check_rate_limit()
 
             # Make API call to Claude with retry logic
-            response: Message = await self._make_api_call_with_retry(messages)
+            response: Message = await self._make_api_call_with_retry(messages, dynamic_system_prompt)
             
             # Extract response content
             response_content = response.content[0].text if response.content else ""
@@ -147,43 +156,74 @@ Current context will be provided with each request, including weather data and u
             logger.error(f"Error generating LLM response: {str(e)}")
             raise self._create_llm_error("generation_error", str(e), {"original_message": message})
 
+    def _build_dynamic_system_prompt(
+        self, 
+        system_messages: List[LLMMessage], 
+        context: Optional[LLMContext] = None
+    ) -> str:
+        """
+        Build a dynamic system prompt combining base personality with session context
+        
+        Args:
+            system_messages: System messages from conversation history (context data)
+            context: Optional additional context (usually None since context comes from system_messages)
+            
+        Returns:
+            Enhanced system prompt string
+        """
+        # Start with base system prompt
+        system_parts = [self.system_prompt]
+        
+        # Add session context from system messages (weather/calendar data stored in DB)
+        if system_messages:
+            for sys_msg in system_messages:
+                # Add the system message content as session context
+                system_parts.append(f"\n\nCurrent Session Context:\n{sys_msg.content}")
+        
+        # If we have additional context passed directly (fallback for HTTP API)
+        elif context:
+            context_parts = []
+            
+            # Add current time
+            current_time = datetime.now()
+            context_parts.append(f"Current time: {current_time.strftime('%A, %B %d, %Y at %I:%M %p')}")
+            
+            # Add weather context if available
+            if context.weather_data:
+                weather_info = self._format_weather_context(context.weather_data)
+                if weather_info:
+                    context_parts.append(f"Current weather: {weather_info}")
+            
+            # Add calendar context if available
+            if context.calendar_events:
+                calendar_info = self._format_calendar_context(context.calendar_events)
+                if calendar_info:
+                    context_parts.append(f"Upcoming events: {calendar_info}")
+            
+            # Add location context if available
+            if context.location:
+                context_parts.append(f"Location: {context.location}")
+            
+            if context_parts:
+                system_parts.append(f"\n\nCurrent Session Context:\n" + "\n".join(context_parts))
+        
+        return "".join(system_parts)
+
     def _build_enriched_prompt(self, message: str, context: Optional[LLMContext] = None) -> str:
         """
-        Build an enriched prompt with context information
+        Build user message prompt (context now goes to system prompt)
         
         Args:
             message: Original user message
-            context: Context data to include
+            context: Context data (now handled in system prompt, kept for HTTP API compatibility)
             
         Returns:
-            Enriched prompt string
+            User message string (context moved to system prompt)
         """
-        prompt_parts = []
-        
-        # Add current time context
-        current_time = datetime.now()
-        prompt_parts.append(f"Current time: {current_time.strftime('%A, %B %d, %Y at %I:%M %p')}")
-        
-        # Add weather context if available
-        if context and context.weather_data:
-            weather_info = self._format_weather_context(context.weather_data)
-            if weather_info:
-                prompt_parts.append(f"Current weather: {weather_info}")
-        
-        # Add calendar context if available
-        if context and context.calendar_events:
-            calendar_info = self._format_calendar_context(context.calendar_events)
-            if calendar_info:
-                prompt_parts.append(f"Upcoming events: {calendar_info}")
-        
-        # Add location context if available
-        if context and context.location:
-            prompt_parts.append(f"Location: {context.location}")
-        
-        # Add the user's message
-        prompt_parts.append(f"User question: {message}")
-        
-        return "\n\n".join(prompt_parts)
+        # For WebSocket: Context is now in system prompt via session context
+        # For HTTP API: We might still need context here as fallback
+        # Keep it simple - just return the user message since context is in system prompt
+        return message
 
     def _format_weather_context(self, weather_data: Dict[str, Any]) -> str:
         """Format weather data for context inclusion"""
@@ -257,7 +297,7 @@ Current context will be provided with each request, including weather data and u
 
         self.request_count += 1
 
-    async def _make_api_call_with_retry(self, messages: List[Dict[str, str]]) -> Message:
+    async def _make_api_call_with_retry(self, messages: List[Dict[str, str]], system_prompt: str) -> Message:
         """Make API call with exponential backoff retry logic"""
         last_exception = None
 
@@ -267,7 +307,7 @@ Current context will be provided with each request, including weather data and u
                     model=self.model,
                     max_tokens=self.max_tokens,
                     temperature=self.temperature,
-                    system=self.system_prompt,
+                    system=system_prompt,
                     messages=messages
                 )
                 return response

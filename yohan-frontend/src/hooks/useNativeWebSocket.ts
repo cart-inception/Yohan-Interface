@@ -2,6 +2,7 @@
 // This is a fallback in case react-use-websocket has compatibility issues
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ReadyState } from 'react-use-websocket';
 import { useAppStore } from '../store/appStore';
 import type {
   WebSocketMessage,
@@ -13,13 +14,7 @@ import type { ChatMessageType } from '../types/chat';
 // WebSocket configuration
 const WEBSOCKET_URL = 'ws://localhost:8000/ws/comms';
 
-export enum ReadyState {
-  CONNECTING = 0,
-  OPEN = 1,
-  CLOSING = 2,
-  CLOSED = 3,
-  UNINSTANTIATED = -1,
-}
+// Using ReadyState from react-use-websocket for consistency
 
 /**
  * Native WebSocket hook as an alternative to react-use-websocket

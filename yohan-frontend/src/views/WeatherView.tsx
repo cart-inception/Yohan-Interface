@@ -6,7 +6,7 @@ export function WeatherView() {
 
   if (isLoading) {
     return (
-      <div className="bg-background p-4" style={{ height: 'calc(100vh - 80px)' }}>
+      <div className="bg-background p-2" style={{ height: 'calc(100vh - 80px)' }}>
         <div className="max-w-6xl mx-auto h-full">
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -21,7 +21,7 @@ export function WeatherView() {
 
   if (!weatherData) {
     return (
-      <div className="bg-background p-4" style={{ height: 'calc(100vh - 80px)' }}>
+      <div className="bg-background p-2" style={{ height: 'calc(100vh - 80px)' }}>
         <div className="max-w-6xl mx-auto h-full">
           <div className="flex items-center justify-center h-full">
             <Card className="max-w-md">
@@ -95,32 +95,30 @@ export function WeatherView() {
   })();
 
   return (
-    <div className="bg-background p-3 dashboard-optimized overflow-hidden" style={{ height: 'calc(100vh - 85px)' }}>
+    <div className="bg-background p-1.5" style={{ height: 'calc(100vh - 80px)', overflow: 'hidden' }}>
       <div className="h-full max-w-6xl mx-auto">
-        {/* Two-row layout optimized for 1024x600 */}
-        <div className="h-full grid grid-rows-2 gap-3 pb-2">
+        {/* Two-row layout optimized for 1024x600 - using specific heights */}
+        <div className="h-full grid" style={{ gridTemplateRows: '45% 55%', gap: '8px' }}>
 
           {/* Top Row - Current Weather */}
-          <Card className="window-container">
-            <CardContent className="p-3 h-full">
-              <div className="grid grid-cols-2 gap-4 h-full items-center">
+          <Card className="window-container overflow-hidden">
+            <CardContent className="p-2 h-full">
+              <div className="grid grid-cols-2 gap-3 h-full items-center">
 
                 {/* Current Temperature and Conditions */}
                 <div className="text-center">
-                  <div className="mb-1">
-                    <div className="text-lg font-semibold text-primary mb-1">
-                      {weatherData.location || 'Des Moines, Iowa'}
-                    </div>
+                  <div className="text-base font-semibold text-primary mb-1">
+                    {weatherData.location || 'Des Moines, Iowa'}
                   </div>
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <div className="text-4xl font-light text-foreground">
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="text-3xl font-light text-foreground">
                       {formatTemp(current.temp)}
                     </div>
                     <div className="text-left">
-                      <p className="text-base text-muted-foreground capitalize">
+                      <p className="text-sm text-muted-foreground capitalize">
                         {current.description}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         Feels like {formatTemp(current.feels_like)}
                       </p>
                     </div>
@@ -128,29 +126,29 @@ export function WeatherView() {
                 </div>
 
                 {/* Current Weather Details */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-secondary/50 rounded-lg p-3 text-center weather-detail-card">
-                    <div className="text-xl font-semibold text-foreground">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-secondary/50 rounded-lg p-2 text-center">
+                    <div className="text-lg font-semibold text-foreground">
                       {current.humidity}%
                     </div>
                     <div className="text-xs text-muted-foreground">Humidity</div>
                   </div>
 
-                  <div className="bg-secondary/50 rounded-lg p-3 text-center weather-detail-card">
-                    <div className="text-xl font-semibold text-foreground">
+                  <div className="bg-secondary/50 rounded-lg p-2 text-center">
+                    <div className="text-lg font-semibold text-foreground">
                       {Math.round(current.wind_speed)} mph
                     </div>
                     <div className="text-xs text-muted-foreground">Wind Speed</div>
                   </div>
 
-                  <div className="bg-secondary/50 rounded-lg p-3 text-center weather-detail-card">
+                  <div className="bg-secondary/50 rounded-lg p-2 text-center">
                     <div className="text-sm font-semibold text-foreground">
                       {formatTime(current.sunrise)}
                     </div>
                     <div className="text-xs text-muted-foreground">Sunrise</div>
                   </div>
 
-                  <div className="bg-secondary/50 rounded-lg p-3 text-center weather-detail-card">
+                  <div className="bg-secondary/50 rounded-lg p-2 text-center">
                     <div className="text-sm font-semibold text-foreground">
                       {formatTime(current.sunset)}
                     </div>
@@ -162,24 +160,24 @@ export function WeatherView() {
           </Card>
 
           {/* Bottom Row - Split between Hourly and Daily Forecasts */}
-          <div className="grid grid-cols-2 gap-4 h-full weather-forecast-container">
+          <div className="grid grid-cols-2 gap-2 h-full">
 
             {/* Hourly Forecast - Compact for 7-inch screen */}
-            <Card>
-              <CardHeader className="pb-1">
-                <CardTitle className="text-base font-semibold text-foreground">12-Hour Forecast</CardTitle>
+            <Card className="h-full flex flex-col overflow-hidden">
+              <CardHeader className="py-1.5 px-2.5">
+                <CardTitle className="text-sm font-semibold text-foreground">12-Hour Forecast</CardTitle>
               </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-2 gap-1 h-full overflow-hidden">
-                  {next12Hours.slice(0, 6).map((hour, index) => (
+              <CardContent className="p-1.5 flex-1 overflow-y-auto">
+                <div className="grid grid-cols-2 gap-1">
+                  {next12Hours.slice(0, 8).map((hour, index) => (
                     <div
                       key={index}
-                      className="bg-secondary/30 rounded-lg p-1.5 text-center hover:bg-secondary/50 transition-colors"
+                      className="bg-secondary/30 rounded p-1 text-center hover:bg-secondary/50 transition-colors"
                     >
-                      <div className="text-xs text-muted-foreground mb-0.5">
+                      <div className="text-xs text-muted-foreground">
                         {formatTime(hour.time)}
                       </div>
-                      <div className="text-sm font-semibold text-foreground mb-0.5">
+                      <div className="text-sm font-semibold text-foreground">
                         {formatTemp(hour.temp)}
                       </div>
                       <div className="text-xs text-muted-foreground capitalize truncate">
@@ -192,19 +190,19 @@ export function WeatherView() {
             </Card>
 
             {/* 7-Day Forecast - Compact for 7-inch screen */}
-            <Card>
-              <CardHeader className="pb-1">
-                <CardTitle className="text-base font-semibold text-foreground">7-Day Forecast</CardTitle>
+            <Card className="h-full flex flex-col overflow-hidden">
+              <CardHeader className="py-1.5 px-2.5">
+                <CardTitle className="text-sm font-semibold text-foreground">7-Day Forecast</CardTitle>
               </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-1 h-full overflow-hidden">
-                  {next7Days.slice(0, 5).map((day, index) => (
+              <CardContent className="p-1.5 flex-1 overflow-y-auto">
+                <div className="space-y-0.5">
+                  {next7Days.slice(0, 7).map((day, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-1.5 bg-secondary/30 rounded-lg hover:bg-secondary/50 transition-colors"
+                      className="flex items-center justify-between p-1 bg-secondary/30 rounded hover:bg-secondary/50 transition-colors"
                     >
-                      <div className="flex items-center gap-2 flex-1">
-                        <div className="text-xs font-medium text-foreground min-w-[50px]">
+                      <div className="flex items-center gap-1.5 flex-1">
+                        <div className="text-xs font-medium text-foreground min-w-[40px]">
                           {(() => {
                             const dayDate = new Date(day.date);
                             const today = new Date();
@@ -223,7 +221,7 @@ export function WeatherView() {
                         <span className="text-xs font-semibold text-foreground">
                           {formatTemp(day.max_temp)}
                         </span>
-                        <span className="text-muted-foreground text-xs mx-1">/</span>
+                        <span className="text-muted-foreground text-xs mx-0.5">/</span>
                         <span className="text-muted-foreground text-xs">
                           {formatTemp(day.min_temp)}
                         </span>

@@ -15,6 +15,9 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
+# Initialize database (first time only)
+python scripts/init_database.py
+
 # Run the backend server
 uvicorn app.main:app --reload
 
@@ -51,16 +54,17 @@ This is a full-stack smart calendar application with a Python/FastAPI backend an
 
 ### Backend Architecture (yohan-backend/)
 - **FastAPI** application with modular router structure
-- **Services** handle business logic (weather_service.py, calendar_service.py, llm_service.py)
+- **Services** handle business logic (weather_service.py, calendar_service.py, llm_service.py, chat_history_service.py, heartbeat_service.py)
 - **Schemas** define Pydantic models for request/response validation
-- **WebSocket Manager** handles real-time connections (currently unused for chat)
+- **WebSocket Manager** handles real-time connections with user session management
+- **Database Models** provide chat history persistence using SQLAlchemy
 - **Settings** centralize configuration via environment variables
 
 Key API endpoints:
 - `/api/weather/*` - Weather data from OpenWeatherMap
 - `/api/calendar/*` - Calendar events from iCal files
-- `/api/chat/*` - LLM chat via Anthropic Claude
-- `/api/comms/*` - WebSocket connections
+- `/api/chat/*` - LLM chat via Anthropic Claude (HTTP fallback)
+- `/ws/comms` - WebSocket connections with session management
 
 ### Frontend Architecture (yohan-frontend/)
 - **Views** contain main application screens (Dashboard, Weather, Calendar, Chat)
@@ -77,18 +81,25 @@ State management flow:
 
 ### Key Implementation Notes
 
-1. **Chat Feature**: Recently migrated from WebSocket to HTTP endpoints. Chat history clears when navigating away from the chat view.
+1. **Chat Feature**: Uses WebSocket connections by default with HTTP fallback for reliability. Chat history persists across sessions using SQLAlchemy database.
 
-2. **Environment Variables**: Backend requires `.env` file with:
+2. **WebSocket Features**: 
+   - User session management with unique session IDs
+   - Message acknowledgment system with delivery tracking
+   - Automatic heartbeat monitoring and connection health checks
+   - Real-time chat with message persistence
+
+3. **Environment Variables**: Backend requires `.env` file with:
    - `ANTHROPIC_API_KEY` for LLM integration
    - `OPENWEATHERMAP_API_KEY` for weather data
    - `CALENDAR_URL` for iCal feed
+   - `DATABASE_URL` (optional, defaults to SQLite)
 
-3. **CORS Configuration**: Backend configured for local development (localhost:5173)
+4. **CORS Configuration**: Backend configured for local development (localhost:5173)
 
-4. **Type Safety**: Frontend uses TypeScript with defined types in `src/types/`. Backend uses Pydantic for validation.
+5. **Type Safety**: Frontend uses TypeScript with defined types in `src/types/`. Backend uses Pydantic for validation.
 
-5. **Widget System**: Dashboard displays widgets that link to dedicated views. Each widget can show preview data.
+6. **Widget System**: Dashboard displays widgets that link to dedicated views. Each widget can show preview data.
 
 ### Development Workflow
 
