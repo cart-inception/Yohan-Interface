@@ -56,10 +56,11 @@ export function DashboardView() {
               </div>
 
               {/* Chat Access Widget - Takes 1/3 of bottom row */}
-              <div
-                className="cursor-pointer touch-target h-full min-h-0 transition-all duration-200 hover:scale-[1.02] hover:z-10"
-                onClick={handleChatNavigation}
-              >
+              <div className="h-full min-h-0 flex flex-col gap-3">
+                <div
+                  className="cursor-pointer touch-target flex-1 transition-all duration-200 hover:scale-[1.02] hover:z-10"
+                  onClick={handleChatNavigation}
+                >
                 <div className="h-full relative rounded-2xl bg-card text-card-foreground border-2 border-transparent bg-gradient-to-br from-blue-500/50 via-blue-400/30 to-blue-500/50 p-[2px] card-glow transition-all duration-200">
                   <div className="h-full w-full rounded-xl bg-card p-6">
                     <div className="flex flex-col items-center justify-center h-full text-center">
@@ -84,6 +85,23 @@ export function DashboardView() {
                       </p>
                     </div>
                   </div>
+                </div>
+                </div>
+                
+                {/* Voice Test Buttons - Temporary for testing */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCurrentView('voice-test')}
+                    className="flex-1 px-2 py-2 bg-green-500/20 text-green-400 rounded-lg text-xs hover:bg-green-500/30 transition-colors"
+                  >
+                    🎤 Voice
+                  </button>
+                  <button
+                    onClick={() => setCurrentView('tts-test')}
+                    className="flex-1 px-2 py-2 bg-blue-500/20 text-blue-400 rounded-lg text-xs hover:bg-blue-500/30 transition-colors"
+                  >
+                    🔊 TTS
+                  </button>
                 </div>
               </div>
             </div>

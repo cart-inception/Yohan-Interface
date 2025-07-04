@@ -8,3 +8,4 @@ icalendar
 anthropic
 sqlalchemy
 alembic
+elevenlabs

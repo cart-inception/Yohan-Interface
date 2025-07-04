@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from . import settings
-from .routers import weather, calendar, comms, chat
+from .routers import weather, calendar, comms, chat, tts
 from .services.heartbeat_service import heartbeat_service
 from .models.init_db import create_tables
 
@@ -37,6 +37,7 @@ app.add_middleware(
 app.include_router(weather.router, prefix="/api")
 app.include_router(calendar.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
+app.include_router(tts.router)
 
 # Include WebSocket router
 app.include_router(comms.router)

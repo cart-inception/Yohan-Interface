@@ -9,6 +9,8 @@ import { DashboardView } from './views/DashboardView';
 import { WeatherView } from './views/WeatherView';
 import { CalendarView } from './views/CalendarView';
 import { ChatView } from './views/ChatView';
+import { VoiceTestView } from './views/VoiceTestView';
+import TTSTest from './components/TTSTest';
 
 function App() {
   const [isInitializing, setIsInitializing] = useState(true);
@@ -16,7 +18,7 @@ function App() {
 
   // Get store state and actions
   const {
-    voiceStatus,
+    voice,
     currentView,
     error,
     setWeatherData,
@@ -58,7 +60,7 @@ function App() {
       webSocketHook.pendingMessageCount, httpHook.isConnected, httpHook.connectionStatus, httpHook.isLoading]);
 
   // Function to handle view changes (chat history now persists across navigation)
-  const handleViewChange = (newView: 'dashboard' | 'weather' | 'calendar' | 'chat') => {
+  const handleViewChange = (newView: 'dashboard' | 'weather' | 'calendar' | 'chat' | 'voice-test' | 'tts-test') => {
     setCurrentView(newView);
   };
 
@@ -182,6 +184,8 @@ function App() {
                 {currentView === 'weather' && 'Weather Forecast'}
                 {currentView === 'calendar' && 'Calendar'}
                 {currentView === 'chat' && 'AI Assistant'}
+                {currentView === 'voice-test' && 'Voice Test'}
+                {currentView === 'tts-test' && 'TTS Test'}
               </div>
             </div>
 
@@ -249,22 +253,26 @@ function App() {
 
               {/* Voice Status Indicator */}
               <div className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-200 ${
-                voiceStatus === 'idle' ? 'bg-secondary/50 text-muted-foreground' :
-                voiceStatus === 'listening' ? 'bg-primary/20 text-primary animate-pulse' :
-                voiceStatus === 'processing' ? 'bg-yellow-500/20 text-yellow-400 animate-pulse' :
+                voice.status === 'idle' ? 'bg-secondary/50 text-muted-foreground' :
+                voice.status === 'listening' ? 'bg-primary/20 text-primary animate-pulse' :
+                voice.status === 'processing' ? 'bg-yellow-500/20 text-yellow-400 animate-pulse' :
                 'bg-purple-500/20 text-purple-400 animate-pulse'
               }`}>
                 <div className="flex items-center gap-2">
-                  {voiceStatus === 'listening' && (
+                  {voice.status === 'listening' && (
                     <div className="w-2 h-2 bg-primary rounded-full animate-ping"></div>
                   )}
-                  {voiceStatus === 'processing' && (
+                  {voice.status === 'processing' && (
                     <div className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
                   )}
-                  {voiceStatus === 'speaking' && (
+                  {voice.status === 'speaking' && (
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-ping"></div>
                   )}
-                  {voiceStatus.charAt(0).toUpperCase() + voiceStatus.slice(1)}
+                  {voice.isAwake && (
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  )}
+                  {voice.status.charAt(0).toUpperCase() + voice.status.slice(1)}
+                  {voice.isAwake && ' (Awake)'}
                 </div>
               </div>
             </div>
@@ -296,6 +304,18 @@ function App() {
               isConnected={isConnected}
               connectionStatus={connectionStatus}
             />
+          </div>
+        )}
+        {currentView === 'voice-test' && (
+          <div className="animate-in fade-in-0 slide-in-from-right-4 duration-300">
+            <VoiceTestView />
+          </div>
+        )}
+        {currentView === 'tts-test' && (
+          <div className="animate-in fade-in-0 slide-in-from-right-4 duration-300">
+            <div className="min-h-screen bg-background p-8 flex items-center justify-center">
+              <TTSTest />
+            </div>
           </div>
         )}
       </div>

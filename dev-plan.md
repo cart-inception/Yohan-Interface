@@ -137,36 +137,65 @@ This document provides a highly detailed, phased development plan. Each task is 
     - [x] 3.3.5.6: Add visual feedback for connection status and message sending state.
     - [x] 3.3.5.7: Implement loading indicators for when the LLM is generating a response.
 
-    From this point on we have switched to an http api call to the backend instead of a WebSocket connection.
+    We implemented a fully functional chat view with WebSocket integration. However, we encountered some issues with WebSocket connections being dropped, especially when the app was first loaded. We decided to implement an HTTP fallback for chat messages as a temporary solution. From there we added history with SQlite database. We also modified the system prompt to use dynamic context where the weather and calendar information are added into the system prompt. This allows us to remove the context parameter from the LLMRequest model and simplify the API.
 
   - **3.3.6: Refinement**
     - [x] 3.3.6.1: Optimize the system prompt based on testing results.
-    - [] 3.3.6.2: Fine-tune the UI for better usability and aesthetics.
-    - [ ] 3.3.6.3: Implement message persistence to maintain chat history across sessions.
+    - [x] 3.3.6.2: Fine-tune the UI for better usability and aesthetics.
+    - [x] 3.3.6.3: Implement message persistence to maintain chat history across sessions.
     - [ ] 3.3.6.4: Add the ability to clear chat history.
     - [ ] 3.3.6.5: Consider implementing typing indicators or other dynamic feedback.
 
 ---
 
-## Phase 4: Voice Integration
+## Phase 4: Voice Integration (Hybrid Approach)
 
-**Goal:** Implement the full hands-free voice interaction loop.
+**Goal:** Implement full hands-free voice interaction using Web Speech API for recognition and ElevenLabs for high-quality TTS.
 
-- **4.1: Voice Service (Backend)**
-  - [ ] 4.1.1: Add `pvporcupine`, `vosk`, and `elevenlabs` to `requirements.txt`.
-  - [ ] 4.1.2: Create `app/services/voice_service.py`.
-  - [ ] 4.1.3: Implement a `WakeWordListener` class that runs Porcupine in a separate thread.
-  - [ ] 4.1.4: When the wake word is detected, the listener should use a callback to notify the main app, which then broadcasts a `status: listening` message via WebSocket.
-  - [ ] 4.1.5: Implement an `STT` class that uses Vosk to listen and transcribe audio after the wake word is detected.
-  - [ ] 4.1.6: Implement a `TTS` class that takes text and uses the Eleven Labs API to generate and play audio.
+**Architecture:** Frontend-centric speech recognition with backend TTS for optimal quality and performance.
 
-- **4.2: Voice Control Flow (Backend)**
-  - [ ] 4.2.1: Orchestrate the voice services. After the wake word, start STT. After transcription, send the text to the LLM service. Take the LLM's text response and send it to the TTS service.
-  - [ ] 4.2.2: Update the WebSocket status at each step: `listening` -> `processing` -> `speaking` -> `idle`.
+- **4.1: Core Voice Services (Frontend)**
+  - [x] 4.1.1: Install react-speech-recognition: `npm install react-speech-recognition`.
+  - [x] 4.1.2: Create `src/hooks/useSpeechRecognition.ts` with Web Speech API integration.
+  - [x] 4.1.3: Create `src/hooks/useTextToSpeech.ts` for Web Speech API synthesis (fallback).
+  - [x] 4.1.4: Implement wake word detection using continuous listening with keyword matching.
+  - [x] 4.1.5: Add voice status management to Zustand store (idle, listening, processing, speaking).
+  - [x] 4.1.6: Create voice command parser that maps speech to chat messages.
+  - [x] 4.1.7: Integrate voice commands with existing chat WebSocket/HTTP system.
 
-- **4.3: Voice Indicator (Frontend)**
-  - [ ] 4.3.1: Create `src/components/VoiceIndicator.tsx`. It should have different visual states (e.g., icon, color, animation) based on the `voiceStatus` from the Zustand store.
-  - [ ] 4.3.2: Place this indicator in a persistent location in the main layout.
+- **4.2: Backend TTS Service (ElevenLabs)**
+  - [x] 4.2.1: Add `elevenlabs` to `requirements.txt` and install dependencies.
+  - [x] 4.2.2: Create `app/services/tts_service.py` with ElevenLabs integration.
+  - [x] 4.2.3: Add `ELEVENLABS_API_KEY` to `.env` and update `app/settings.py`.
+  - [x] 4.2.4: Implement voice selection and voice settings (speed, stability, clarity).
+  - [x] 4.2.5: Add TTS caching system to reduce API calls for repeated phrases.
+  - [x] 4.2.6: Create WebSocket endpoint for streaming audio back to frontend.
+  - [x] 4.2.7: Implement error handling and fallback to Web Speech API TTS.
+
+- **4.3: Voice Command Integration**
+  - [ ] 4.3.1: Add voice-triggered calendar queries ("What's my schedule today?").
+  - [ ] 4.3.2: Add voice-triggered weather queries ("How's the weather?").
+  - [ ] 4.3.3: Implement voice response synthesis for LLM chat responses.
+  - [ ] 4.3.4: Create voice shortcuts for common tasks.
+  - [ ] 4.3.5: Add multi-language support matching user's locale.
+
+- **4.4: UI Components & Voice Feedback**
+  - [ ] 4.4.1: Create `src/components/VoiceIndicator.tsx` with animated states (idle, listening, processing, speaking).
+  - [ ] 4.4.2: Add voice control toggle to main navigation.
+  - [ ] 4.4.3: Create voice settings panel for wake word and TTS configuration.
+  - [ ] 4.4.4: Add visual feedback for speech recognition accuracy.
+  - [ ] 4.4.5: Implement push-to-talk fallback for noisy environments.
+  - [ ] 4.4.6: Create audio playback queue for seamless voice responses.
+  - [ ] 4.4.7: Add audio controls (pause, skip, replay last response).
+
+- **4.5: Enhanced Features & Polish**
+  - [ ] 4.5.1: Implement custom wake word training ("Hey Yohan", "OK Yohan").
+  - [ ] 4.5.2: Add voice activity logging to chat history.
+  - [ ] 4.5.3: Create voice command analytics and usage insights.
+  - [ ] 4.5.4: Implement rate limiting for voice-triggered requests.
+  - [ ] 4.5.5: Add voice accessibility features (slower speech, higher contrast indicators).
+  - [ ] 4.5.6: Cross-browser compatibility testing and fallbacks.
+  - [ ] 4.5.7: Performance optimization for continuous listening.
 
 ---
 
